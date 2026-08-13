@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HomepageSectionController;
+use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,4 +26,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // 首页板块管理
     Route::resource('sections', HomepageSectionController::class)->except(['show']);
+
+    // 单页管理
+    Route::resource('pages', PageController::class)->except(['show']);
 });
