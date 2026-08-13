@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\HomepageSectionController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PostCategoryController;
@@ -42,4 +43,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::resource('posts', PostController::class)->except(['show']);
     Route::resource('post-categories', PostCategoryController::class)->except(['show', 'create', 'edit'])
         ->names('post-categories');
+
+    // 留言管理
+    Route::resource('messages', ContactMessageController::class)->except(['create', 'store', 'edit', 'update']);
 });
