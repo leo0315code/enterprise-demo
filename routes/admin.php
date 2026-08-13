@@ -12,15 +12,19 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use Illuminate\Support\Facades\Route;
 
+// 后台路径前缀（可在 .env 的 ADMIN_PREFIX 中配置，避免暴露为 admin）
+// 注意：URL 前缀可配置，但路由名称仍统一为 admin.*，便于代码内部引用。
+$prefix = env('ADMIN_PREFIX', 'manage');
+
 // ========== 后台认证 ==========
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix($prefix)->name('admin.')->group(function () {
     // 未登录可访问
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 });
 
 // ========== 后台受保护路由 ==========
-Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+Route::prefix($prefix)->name('admin.')->middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');

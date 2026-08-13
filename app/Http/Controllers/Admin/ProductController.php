@@ -21,8 +21,15 @@ class ProductController extends Controller
         if ($request->filled('q')) {
             $query->where('title', 'like', '%' . $request->q . '%');
         }
-        $products = $query->paginate(15);
-        return view('admin.products.index', compact('products'));
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        $products = $query->paginate(15)->withQueryString();
+        $categories = Category::active()->where('type', 'product')->ordered()->get();
+        return view('admin.products.index', compact('products', 'categories'));
     }
 
     public function create()

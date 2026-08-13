@@ -3,7 +3,16 @@
 @section('page_title', '仪表盘')
 
 @section('content')
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+@if($weakPassword)
+<div class="mb-6 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg flex items-start justify-between gap-4">
+    <div>
+        <div class="font-medium">⚠️ 安全提醒</div>
+        <div class="text-sm mt-1">当前管理员仍使用默认密码 <code class="bg-amber-100 px-1 rounded">admin123</code>，存在安全隐患。请尽快修改密码（可在数据库中更新，或使用 tinker 重置）。</div>
+    </div>
+</div>
+@endif
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
     <div class="bg-white rounded-xl shadow-sm p-6">
         <div class="text-sm text-gray-500">产品服务</div>
         <div class="text-3xl font-bold text-gray-800 mt-2">{{ $stats['products'] }}</div>
@@ -13,6 +22,16 @@
         <div class="text-sm text-gray-500">新闻文章</div>
         <div class="text-3xl font-bold text-gray-800 mt-2">{{ $stats['posts'] }}</div>
         <a href="{{ route('admin.posts.index') }}" class="text-xs text-blue-600 hover:underline mt-1 inline-block">管理 →</a>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="text-sm text-gray-500">产品分类</div>
+        <div class="text-3xl font-bold text-gray-800 mt-2">{{ $stats['product_categories'] }}</div>
+        <a href="{{ route('admin.categories.index') }}" class="text-xs text-blue-600 hover:underline mt-1 inline-block">管理 →</a>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="text-sm text-gray-500">文章分类</div>
+        <div class="text-3xl font-bold text-gray-800 mt-2">{{ $stats['post_categories'] }}</div>
+        <a href="{{ route('admin.post-categories.index') }}" class="text-xs text-blue-600 hover:underline mt-1 inline-block">管理 →</a>
     </div>
     <div class="bg-white rounded-xl shadow-sm p-6">
         <div class="text-sm text-gray-500">留言总数</div>

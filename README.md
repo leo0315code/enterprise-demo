@@ -8,7 +8,7 @@
 - **首页可配置**：Hero Banner、公司简介、核心优势、产品/新闻板块、CTA 等自由组合排序
 - **内容管理**：产品/服务、新闻文章、单页（关于/联系）、产品与文章分类
 - **留言系统**：联系表单提交入库，后台可查看/标记已读/回复
-- **后台管理**：独立后台 `/admin`，账号密码登录，侧边栏导航
+- **后台管理**：独立后台（路径可配置，默认 `/manage`），账号密码登录，侧边栏分组导航
 - **响应式设计**：移动端 / 桌面端自适应
 
 ## 环境要求
@@ -46,14 +46,16 @@ npm run build
 php artisan serve
 ```
 
-访问 `http://localhost:8000`，后台 `http://localhost:8000/admin`
+访问 `http://localhost:8000`，后台 `http://localhost:8000/manage`
+
+> 后台入口路径由 `.env` 的 `ADMIN_PREFIX` 控制（默认 `manage`，出于安全考虑已不再是常见的 `admin`），修改后请执行 `php artisan route:clear`。
 
 ## 默认管理员
 
 - 邮箱：`admin@example.com`
-- 密码：`admin123`
+- 密码：`admin123`（**弱口令，首次登录后请尽快修改**，仪表盘会给出安全提醒）
 
-> 生产环境请务必修改管理员密码（在 `database/seeders/DatabaseSeeder.php` 中调整，或登录后自行修改）。
+> 生产环境务必修改管理员密码：可用 `php artisan tinker` 执行 `App\Models\User::first()->update(['password'=>bcrypt('新密码')])`，或重新 seed 前在 `DatabaseSeeder` 中调整。
 
 ## 目录结构
 

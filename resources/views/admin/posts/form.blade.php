@@ -36,7 +36,12 @@
         </div>
         <div class="md:col-span-2">
             <label class="block text-sm font-medium text-gray-700 mb-1">封面图片 URL</label>
-            <input type="text" name="cover" value="{{ old('cover', $post->cover ?? '') }}" placeholder="https://..." class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            <div class="flex gap-4 items-start">
+                <input type="text" name="cover" id="cover" value="{{ old('cover', $post->cover ?? '') }}" placeholder="https://..." class="flex-1 rounded-lg border-gray-300 border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                <img id="cover-preview" src="{{ old('cover', $post->cover ?? '') }}" alt="预览"
+                     class="hidden w-20 h-20 object-cover rounded-lg border border-gray-200">
+            </div>
+            <p class="text-xs text-gray-400 mt-1">留空则前台自动展示默认占位图。粘贴图片链接后会即时预览。</p>
         </div>
         <div class="md:col-span-2">
             <label class="block text-sm font-medium text-gray-700 mb-1">摘要</label>
@@ -61,4 +66,19 @@
         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium">保存</button>
     </div>
 </form>
-@endsection
+
+<script>
+    (function () {
+        var input = document.getElementById('cover');
+        var img = document.getElementById('cover-preview');
+        if (!input || !img) return;
+        function sync() {
+            var v = input.value.trim();
+            if (v) { img.src = v; img.classList.remove('hidden'); }
+            else { img.classList.add('hidden'); }
+        }
+        input.addEventListener('input', sync);
+        img.addEventListener('error', function () { img.classList.add('hidden'); });
+        sync();
+    })();
+</script>

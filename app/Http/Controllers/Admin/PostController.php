@@ -21,8 +21,15 @@ class PostController extends Controller
         if ($request->filled('q')) {
             $query->where('title', 'like', '%' . $request->q . '%');
         }
-        $posts = $query->paginate(15);
-        return view('admin.posts.index', compact('posts'));
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status === 'active');
+        }
+        $posts = $query->paginate(15)->withQueryString();
+        $categories = Category::active()->where('type', 'post')->ordered()->get();
+        return view('admin.posts.index', compact('posts', 'categories'));
     }
 
     public function create()

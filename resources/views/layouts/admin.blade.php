@@ -7,6 +7,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="h-full bg-gray-100">
+    @php($adminPrefix = config('app.admin_prefix', 'manage'))
     <div class="min-h-full flex">
         <!-- 侧边栏 -->
         <aside class="w-64 bg-slate-800 text-gray-300 flex flex-col fixed h-full">
@@ -17,6 +18,7 @@
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.dashboard') ? 'bg-slate-700 text-white' : '' }}">
                     📊 仪表盘
                 </a>
+                <div class="px-3 pt-4 pb-1 text-xs uppercase tracking-wider text-slate-500">内容配置</div>
                 <a href="{{ route('admin.settings.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.settings.*') ? 'bg-slate-700 text-white' : '' }}">
                     ⚙️ 站点设置
                 </a>
@@ -26,6 +28,7 @@
                 <a href="{{ route('admin.pages.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.pages.*') ? 'bg-slate-700 text-white' : '' }}">
                     📄 单页管理
                 </a>
+                <div class="px-3 pt-4 pb-1 text-xs uppercase tracking-wider text-slate-500">内容管理</div>
                 <a href="{{ route('admin.products.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.products.*') ? 'bg-slate-700 text-white' : '' }}">
                     📦 产品服务
                 </a>
