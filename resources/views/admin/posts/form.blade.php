@@ -82,3 +82,4 @@
         sync();
     })();
 </script>
+@endsection
