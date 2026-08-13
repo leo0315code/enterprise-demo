@@ -35,6 +35,8 @@ Route::prefix($prefix)->name('admin.')->middleware('auth')->group(function () {
 
     // 首页板块管理
     Route::resource('sections', HomepageSectionController::class)->except(['show']);
+    // 局部：仅返回表格行（供弹窗提交后无刷新刷新列表）
+    Route::get('/sections/rows', [HomepageSectionController::class, 'rows'])->name('sections.rows');
 
     // 单页管理
     Route::resource('pages', PageController::class)->except(['show']);

@@ -24,6 +24,15 @@ class HomepageSectionController extends Controller
         return view('admin.sections.form', ['section' => null]);
     }
 
+    /**
+     * 仅返回表格行 HTML，供弹窗保存后无刷新刷新列表。
+     */
+    public function rows()
+    {
+        $sections = HomepageSection::orderBy('sort')->orderBy('id')->get();
+        return view('admin.sections._rows', compact('sections'));
+    }
+
     public function store(Request $request)
     {
         $data = $this->rules($request);
@@ -35,12 +44,19 @@ class HomepageSectionController extends Controller
 
         HomepageSection::create($data);
 
+        if (request()->ajax()) {
+            return response()->json(['ok' => true]);
+        }
+
         return redirect()->route('admin.sections.index')
             ->with('success', '板块已创建');
     }
 
     public function edit(HomepageSection $section)
     {
+        if (request()->ajax()) {
+            return view('admin.sections._fields', compact('section'));
+        }
         return view('admin.sections.form', compact('section'));
     }
 
@@ -54,6 +70,10 @@ class HomepageSectionController extends Controller
         }
 
         $section->update($data);
+
+        if (request()->ajax()) {
+            return response()->json(['ok' => true]);
+        }
 
         return redirect()->route('admin.sections.index')
             ->with('success', '板块已更新');
