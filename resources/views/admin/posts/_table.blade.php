@@ -2,9 +2,9 @@
 <tr class="transition-colors duration-300 hover:bg-slate-50">
     <td class="px-6 py-3">
         @if($post->cover)
-            <img src="{{ $post->cover }}" class="w-12 h-12 object-cover rounded">
+            <img src="{{ $post->cover }}" alt="{{ $post->title }}" class="w-12 h-12 object-cover rounded" onerror="this.outerHTML='<div class=\'w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded flex items-center justify-center text-sm text-slate-400\'>📰</div>'">
         @else
-            <div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center text-xl">📰</div>
+            <div class="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded flex items-center justify-center text-sm text-slate-400">📰</div>
         @endif
     </td>
     <td class="px-6 py-3 font-medium text-gray-800">
