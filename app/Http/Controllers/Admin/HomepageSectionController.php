@@ -26,7 +26,7 @@ class HomepageSectionController extends Controller
 
     public function store(Request $request)
     {
-        $data = $this->validate($request);
+        $data = $this->rules($request);
 
         if (isset($data['extra']) && is_string($data['extra'])) {
             $decoded = json_decode($data['extra'], true);
@@ -46,7 +46,7 @@ class HomepageSectionController extends Controller
 
     public function update(Request $request, HomepageSection $section)
     {
-        $data = $this->validate($request);
+        $data = $this->rules($request);
 
         if (isset($data['extra']) && is_string($data['extra'])) {
             $decoded = json_decode($data['extra'], true);
@@ -66,7 +66,7 @@ class HomepageSectionController extends Controller
             ->with('success', '板块已删除');
     }
 
-    protected function validate(Request $request): array
+    public function rules(Request $request): array
     {
         return $request->validate([
             'type' => ['required', 'string', 'in:hero,intro,features,products,news,cta,custom'],

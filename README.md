@@ -1,58 +1,87 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 通用企业官网 (Laravel 13)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+一套可灵活配置的通用企业官网系统，基于 Laravel 13 + MySQL + Tailwind CSS v4 + Vite 构建。
 
-## About Laravel
+## 核心特性
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **站点配置可视化**：Logo、联系方式、SEO、主题色等通过后台统一配置，无需改代码
+- **首页可配置**：Hero Banner、公司简介、核心优势、产品/新闻板块、CTA 等自由组合排序
+- **内容管理**：产品/服务、新闻文章、单页（关于/联系）、产品与文章分类
+- **留言系统**：联系表单提交入库，后台可查看/标记已读/回复
+- **后台管理**：独立后台 `/admin`，账号密码登录，侧边栏导航
+- **响应式设计**：移动端 / 桌面端自适应
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 环境要求
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP >= 8.3
+- MySQL 5.7+ (本项目使用 ServBay MySQL 8.0)
+- Node.js 20+ / npm
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## 安装
 
 ```bash
-composer require laravel/boost --dev
+# 1. 安装 PHP 依赖
+composer install
 
-php artisan boost:install
+# 2. 复制环境变量并生成密钥
+cp .env.example .env
+php artisan key:generate
+
+# 3. 配置 .env 数据库连接 (已默认指向本地 enterprise_website 库)
+#   DB_CONNECTION=mysql
+#   DB_HOST=127.0.0.1
+#   DB_PORT=3306
+#   DB_DATABASE=enterprise_website
+#   DB_USERNAME=root
+#   DB_PASSWORD=root
+
+# 4. 创建数据库并执行迁移 + 填充
+php artisan migrate:fresh --seed
+
+# 5. 安装前端依赖并构建
+npm install
+npm run build
+
+# 6. 启动开发服务器
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+访问 `http://localhost:8000`，后台 `http://localhost:8000/admin`
 
-## Contributing
+## 默认管理员
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- 邮箱：`admin@example.com`
+- 密码：`admin123`
 
-## Code of Conduct
+> 生产环境请务必修改管理员密码（在 `database/seeders/DatabaseSeeder.php` 中调整，或登录后自行修改）。
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 目录结构
 
-## Security Vulnerabilities
+```
+app/
+  Models/            数据模型 (SiteSetting, HomepageSection, Page, Product,
+                     Category, Post, ContactMessage, User)
+  Http/Controllers/
+    Admin/           后台管理控制器
+    HomeController/PageController/...  前台控制器
+database/
+  migrations/        数据库迁移
+  seeders/           初始数据填充
+resources/
+  views/
+    layouts/         公共布局 (app 前台 / admin 后台)
+    components/      头部 / 页脚组件
+    home.blade.php   首页 (按板块类型渲染)
+    admin/           后台页面
+routes/
+  web.php            前台路由
+  admin.php          后台路由
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 自定义首页板块类型
 
-## License
+`homepage_sections` 表的 `type` 字段支持：
+`hero`(Banner) | `intro`(简介) | `features`(卡片) |
+`products`(推荐产品) | `news`(最新新闻) | `cta`(行动召唤) | `custom`(自定义)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+`features` 类型的 `extra` 字段为 JSON 数组：`[{"icon":"🚀","title":"标题","desc":"描述"}]`
