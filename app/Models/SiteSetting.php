@@ -20,16 +20,18 @@ class SiteSetting extends Model
      */
     public static function get(string $key, mixed $default = null): mixed
     {
-        return static::getAll()->get($key, $default);
+        $all = static::getAll();
+        return $all[$key] ?? $default;
     }
 
     /**
-     * 获取所有配置（带缓存）— 缓存数组避免序列化问题
+     * 获取所有配置（带缓存）
+     * 返回普通数组，避免序列化导致的 __PHP_Incomplete_Class 问题
      */
-    public static function getAll(): \Illuminate\Support\Collection
+    public static function getAll(): array
     {
         return Cache::rememberForever('site_settings', function () {
-            return static::query()->pluck('value', 'key');
+            return static::query()->pluck('value', 'key')->toArray();
         });
     }
 

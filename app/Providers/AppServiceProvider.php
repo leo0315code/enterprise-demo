@@ -16,11 +16,15 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // 全局共享站点配置给所有视图（表可能尚未创建）
-        if (Schema::hasTable('site_settings')) {
-            View::share('settings', SiteSetting::getAll());
-        } else {
-            View::share('settings', collect());
+        // 全局共享站点配置给所有视图（表可能尚未创建，需容错）
+        try {
+            if (Schema::hasTable('site_settings')) {
+                View::share('settings', SiteSetting::getAll());
+            } else {
+                View::share('settings', []);
+            }
+        } catch (\Throwable $e) {
+            View::share('settings', []);
         }
     }
 }
