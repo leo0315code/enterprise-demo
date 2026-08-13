@@ -3,7 +3,7 @@
 @section('page_title', '文章分类管理')
 
 @section('content')
-<div class="bg-white rounded-xl shadow-sm overflow-hidden max-w-2xl">
+<div class="bg-white rounded-xl shadow-sm overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
         <h2 class="font-semibold text-gray-800">新闻文章分类</h2>
         <button type="button" onclick="CrudModal.open(null)"
