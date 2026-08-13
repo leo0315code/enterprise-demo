@@ -74,3 +74,4 @@ CrudModal.init({
 });
 </script>
 @endpush
+@endsection
