@@ -24,6 +24,15 @@ class PageController extends Controller
         return view('admin.pages.form', ['page' => null]);
     }
 
+    /**
+     * 仅返回表格局部，供弹窗保存后无刷新刷新列表。
+     */
+    public function rows()
+    {
+        $pages = Page::ordered()->get();
+        return view('admin.pages._table', compact('pages'));
+    }
+
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -38,11 +47,18 @@ class PageController extends Controller
 
         Page::create($data);
 
+        if (request()->ajax()) {
+            return response()->json(['ok' => true]);
+        }
+
         return redirect()->route('admin.pages.index')->with('success', '页面已创建');
     }
 
     public function edit(Page $page)
     {
+        if (request()->ajax()) {
+            return view('admin.pages._fields', compact('page'));
+        }
         return view('admin.pages.form', compact('page'));
     }
 
@@ -59,6 +75,10 @@ class PageController extends Controller
         ]);
 
         $page->update($data);
+
+        if (request()->ajax()) {
+            return response()->json(['ok' => true]);
+        }
 
         return redirect()->route('admin.pages.index')->with('success', '页面已更新');
     }

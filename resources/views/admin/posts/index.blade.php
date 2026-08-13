@@ -5,7 +5,8 @@
 @section('content')
 <div class="flex justify-between items-center mb-6">
     <a href="{{ route('admin.post-categories.index') }}" class="text-sm text-blue-600 hover:underline">← 文章分类</a>
-    <a href="{{ route('admin.posts.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium">+ 发布文章</a>
+    <button type="button" onclick="CrudModal.open(null)"
+            class="bg-blue-600 hover:bg-blue-700 active:scale-95 transition text-white px-4 py-2 rounded-lg text-sm font-medium">+ 发布文章</button>
 </div>
 
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -40,38 +41,37 @@
                 <th class="px-6 py-3 text-right">操作</th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
-            @forelse($posts as $post)
-            <tr class="hover:bg-gray-50">
-                <td class="px-6 py-3">
-                    @if($post->cover)
-                        <img src="{{ $post->cover }}" class="w-12 h-12 object-cover rounded">
-                    @else
-                        <div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center text-xl">📰</div>
-                    @endif
-                </td>
-                <td class="px-6 py-3 font-medium text-gray-800">
-                    {{ $post->title }}
-                    @if($post->is_featured)<span class="text-xs text-amber-600 ml-1">★头条</span>@endif
-                </td>
-                <td class="px-6 py-3 text-gray-500">{{ $post->category->name ?? '未分类' }}</td>
-                <td class="px-6 py-3 text-gray-400">{{ $post->published_at?->format('Y-m-d') ?? '-' }}</td>
-                <td class="px-6 py-3">
-                    @if($post->is_active)<span class="inline-flex items-center text-green-600"><span class="w-2 h-2 rounded-full bg-green-500 mr-1.5"></span>公开</span>@else<span class="inline-flex items-center text-gray-400"><span class="w-2 h-2 rounded-full bg-gray-300 mr-1.5"></span>草稿</span>@endif
-                </td>
-                <td class="px-6 py-3 text-right space-x-2">
-                    <a href="{{ route('admin.posts.edit', $post) }}" class="text-blue-600 hover:underline">编辑</a>
-                    <form action="{{ route('admin.posts.destroy', $post) }}" method="POST" class="inline" onsubmit="return confirm('确认删除？');">
-                        @csrf @method('DELETE')
-                        <button class="text-red-500 hover:underline">删除</button>
-                    </form>
-                </td>
-            </tr>
-            @empty
-            <tr><td colspan="6" class="px-6 py-8 text-center text-gray-400">暂无文章，<a href="{{ route('admin.posts.create') }}" class="text-blue-600">去发布</a></td></tr>
-            @endforelse
+        <tbody id="crud-list-container" class="divide-y divide-gray-100">
+            @include('admin.posts._table', ['posts' => $posts])
         </tbody>
     </table>
     <div class="px-6 py-4">{{ $posts->links() }}</div>
 </div>
-@endsection
+
+@include('admin._modal')
+
+@push('scripts')
+<script>
+CrudModal.init({
+    storeUrl: '{{ route('admin.posts.store') }}',
+    editUrl: '{{ route('admin.posts.edit', '__ID__') }}',
+    tableUrl: '{{ route('admin.posts.rows') }}?' + new URLSearchParams(window.location.search),
+    titleNew: '发布文章',
+    titleEdit: '编辑文章',
+    msgCreate: '文章已发布',
+    msgUpdate: '文章已更新',
+    afterRender(form) {
+        const input = form.querySelector('#cover');
+        const img = form.querySelector('#cover-preview');
+        if (!input || !img) return;
+        const sync = () => {
+            const v = input.value.trim();
+            if (v) { img.src = v; img.classList.remove('hidden'); } else { img.classList.add('hidden'); }
+        };
+        input.addEventListener('input', sync);
+        img.addEventListener('error', () => img.classList.add('hidden'));
+        sync();
+    }
+});
+</script>
+@endpush

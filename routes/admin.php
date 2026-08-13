@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 
 // 后台路径前缀（可在 .env 的 ADMIN_PREFIX 中配置，避免暴露为 admin）
 // 注意：URL 前缀可配置，但路由名称仍统一为 admin.*，便于代码内部引用。
-$prefix = env('ADMIN_PREFIX', 'manage');
+$prefix = config('ADMIN_PREFIX', 'manage');
 
 // ========== 后台认证 ==========
 Route::prefix($prefix)->name('admin.')->group(function () {
@@ -40,15 +40,20 @@ Route::prefix($prefix)->name('admin.')->middleware('auth')->group(function () {
 
     // 单页管理
     Route::resource('pages', PageController::class)->except(['show']);
+    Route::get('/pages/rows', [PageController::class, 'rows'])->name('pages.rows');
 
     // 产品服务管理
     Route::resource('products', ProductController::class)->except(['show']);
-    Route::resource('categories', CategoryController::class)->except(['show', 'create', 'edit']);
+    Route::get('/products/rows', [ProductController::class, 'rows'])->name('products.rows');
+    Route::resource('categories', CategoryController::class)->except(['show', 'create']);
+    Route::get('/categories/rows', [CategoryController::class, 'rows'])->name('categories.rows');
 
     // 新闻文章管理
     Route::resource('posts', PostController::class)->except(['show']);
-    Route::resource('post-categories', PostCategoryController::class)->except(['show', 'create', 'edit'])
+    Route::get('/posts/rows', [PostController::class, 'rows'])->name('posts.rows');
+    Route::resource('post-categories', PostCategoryController::class)->except(['show', 'create'])
         ->names('post-categories');
+    Route::get('/post-categories/rows', [PostCategoryController::class, 'rows'])->name('post-categories.rows');
 
     // 留言管理
     Route::resource('messages', ContactMessageController::class)->except(['create', 'store', 'edit', 'update']);

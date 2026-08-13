@@ -20,6 +20,15 @@ class CategoryController extends Controller
         return view('admin.categories.index', compact('categories'));
     }
 
+    /**
+     * 仅返回表格局部，供弹窗保存后无刷新刷新列表。
+     */
+    public function rows()
+    {
+        $categories = Category::where('type', 'product')->ordered()->get();
+        return view('admin.categories._table', compact('categories'));
+    }
+
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -34,7 +43,19 @@ class CategoryController extends Controller
         $data['is_active'] = $request->boolean('is_active', true);
 
         Category::create($data);
+
+        if (request()->ajax()) {
+            return response()->json(['ok' => true]);
+        }
         return redirect()->route('admin.categories.index')->with('success', '分类已创建');
+    }
+
+    public function edit(Category $category)
+    {
+        if (request()->ajax()) {
+            return view('admin.categories._fields', compact('category'));
+        }
+        return redirect()->route('admin.categories.index');
     }
 
     public function update(Request $request, Category $category)
@@ -50,6 +71,10 @@ class CategoryController extends Controller
         $data['is_active'] = $request->boolean('is_active', true);
 
         $category->update($data);
+
+        if (request()->ajax()) {
+            return response()->json(['ok' => true]);
+        }
         return redirect()->route('admin.categories.index')->with('success', '分类已更新');
     }
 

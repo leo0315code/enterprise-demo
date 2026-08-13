@@ -38,6 +38,16 @@ class PostController extends Controller
         return view('admin.posts.form', ['post' => null, 'categories' => $categories]);
     }
 
+    /**
+     * 仅返回表格局部，供弹窗保存后无刷新刷新列表。
+     */
+    public function rows()
+    {
+        $posts = Post::with('category')->latest()->paginate(15)->withQueryString();
+        $categories = Category::active()->where('type', 'post')->ordered()->get();
+        return view('admin.posts._table', compact('posts', 'categories'));
+    }
+
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -60,12 +70,19 @@ class PostController extends Controller
 
         Post::create($data);
 
+        if (request()->ajax()) {
+            return response()->json(['ok' => true]);
+        }
+
         return redirect()->route('admin.posts.index')->with('success', '文章已发布');
     }
 
     public function edit(Post $post)
     {
         $categories = Category::active()->where('type', 'post')->ordered()->get();
+        if (request()->ajax()) {
+            return view('admin.posts._fields', compact('post', 'categories'));
+        }
         return view('admin.posts.form', compact('post', 'categories'));
     }
 
@@ -89,6 +106,10 @@ class PostController extends Controller
         $data['is_active'] = $request->boolean('is_active', true);
 
         $post->update($data);
+
+        if (request()->ajax()) {
+            return response()->json(['ok' => true]);
+        }
 
         return redirect()->route('admin.posts.index')->with('success', '文章已更新');
     }

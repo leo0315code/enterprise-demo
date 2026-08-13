@@ -38,6 +38,16 @@ class ProductController extends Controller
         return view('admin.products.form', ['product' => null, 'categories' => $categories]);
     }
 
+    /**
+     * 仅返回表格局部，供弹窗保存后无刷新刷新列表。
+     */
+    public function rows()
+    {
+        $products = Product::with('category')->ordered()->paginate(15)->withQueryString();
+        $categories = Category::active()->where('type', 'product')->ordered()->get();
+        return view('admin.products._table', compact('products', 'categories'));
+    }
+
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -57,12 +67,19 @@ class ProductController extends Controller
 
         Product::create($data);
 
+        if (request()->ajax()) {
+            return response()->json(['ok' => true]);
+        }
+
         return redirect()->route('admin.products.index')->with('success', '产品已创建');
     }
 
     public function edit(Product $product)
     {
         $categories = Category::active()->where('type', 'product')->ordered()->get();
+        if (request()->ajax()) {
+            return view('admin.products._fields', compact('product', 'categories'));
+        }
         return view('admin.products.form', compact('product', 'categories'));
     }
 
@@ -84,6 +101,10 @@ class ProductController extends Controller
         $data['is_featured'] = $request->boolean('is_featured');
 
         $product->update($data);
+
+        if (request()->ajax()) {
+            return response()->json(['ok' => true]);
+        }
 
         return redirect()->route('admin.products.index')->with('success', '产品已更新');
     }
