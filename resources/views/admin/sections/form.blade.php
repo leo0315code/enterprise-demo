@@ -55,7 +55,7 @@
 
         <div class="md:col-span-2">
             <label class="block text-sm font-medium text-gray-700 mb-1">扩展配置（JSON，如卡片列表）</label>
-            <textarea name="extra" rows="4" class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none font-mono">{{ old('extra', $section->extra ? json_encode($section->extra, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE) : '') }}</textarea>
+            <textarea name="extra" rows="4" class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none font-mono">{{ old('extra', isset($section) && $section->extra ? json_encode($section->extra, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE) : '') }}</textarea>
             <p class="text-xs text-gray-400 mt-1">格式：[{"icon":"🚀","title":"标题","desc":"描述"}]</p>
         </div>
 
