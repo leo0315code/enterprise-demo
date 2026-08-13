@@ -30,10 +30,13 @@
                     📦 产品服务
                 </a>
                 <a href="{{ route('admin.categories.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.categories.*') ? 'bg-slate-700 text-white' : '' }}">
-                    🏷️ 分类管理
+                    🏷️ 产品分类
                 </a>
                 <a href="{{ route('admin.posts.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.posts.*') ? 'bg-slate-700 text-white' : '' }}">
                     📰 新闻文章
+                </a>
+                <a href="{{ route('admin.post-categories.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.post-categories.*') ? 'bg-slate-700 text-white' : '' }}">
+                    🗂️ 文章分类
                 </a>
                 <a href="{{ route('admin.messages.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.messages.*') ? 'bg-slate-700 text-white' : '' }}">
                     ✉️ 留言管理

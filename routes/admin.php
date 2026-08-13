@@ -5,6 +5,8 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\HomepageSectionController;
 use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\PostCategoryController;
+use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use Illuminate\Support\Facades\Route;
@@ -35,4 +37,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // 产品服务管理
     Route::resource('products', ProductController::class)->except(['show']);
     Route::resource('categories', CategoryController::class)->except(['show', 'create', 'edit']);
+
+    // 新闻文章管理
+    Route::resource('posts', PostController::class)->except(['show']);
+    Route::resource('post-categories', PostCategoryController::class)->except(['show', 'create', 'edit'])
+        ->names('post-categories');
 });
