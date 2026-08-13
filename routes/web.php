@@ -1,36 +1,29 @@
 <?php
 
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('home');
-})->name('home');
+// 首页
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// 关于我们（单页）
-Route::get('/about', function () {
-    return view('pages.about');
-})->name('about');
+// 单页 (关于/联系等，由后台 Page 管理)
+Route::get('/p/{slug}', [PageController::class, 'show'])->name('page.show');
+
+// 关于我们 / 联系我们 快捷路由（映射到 Page slug）
+Route::get('/about', [PageController::class, 'show'])->defaults('slug', 'about')->name('about');
+Route::get('/contact', [PageController::class, 'show'])->defaults('slug', 'contact')->name('contact');
 
 // 产品服务
-Route::get('/products', function () {
-    return view('products.index');
-})->name('products.index');
-Route::get('/products/{slug}', function ($slug) {
-    return view('products.show', compact('slug'));
-})->name('products.show');
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 
 // 新闻文章
-Route::get('/news', function () {
-    return view('posts.index');
-})->name('posts.index');
-Route::get('/news/{slug}', function ($slug) {
-    return view('posts.show', compact('slug'));
-})->name('posts.show');
+Route::get('/news', [PostController::class, 'index'])->name('posts.index');
+Route::get('/news/{slug}', [PostController::class, 'show'])->name('posts.show');
 
-// 联系我们
-Route::get('/contact', function () {
-    return view('contact.index');
-})->name('contact');
-Route::post('/contact', function () {
-    return redirect()->back()->with('success', '留言已提交，我们会尽快与您联系');
-})->name('contact.submit');
+// 联系我们 - 留言提交
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.submit');

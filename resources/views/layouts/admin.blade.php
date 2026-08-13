@@ -20,6 +20,9 @@
                 <a href="{{ route('admin.settings.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.settings.*') ? 'bg-slate-700 text-white' : '' }}">
                     ⚙️ 站点设置
                 </a>
+                <a href="{{ route('admin.sections.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.sections.*') ? 'bg-slate-700 text-white' : '' }}">
+                    🏠 首页板块
+                </a>
                 <a href="{{ route('admin.pages.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.pages.*') ? 'bg-slate-700 text-white' : '' }}">
                     📄 单页管理
                 </a>

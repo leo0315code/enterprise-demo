@@ -11,15 +11,18 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 创建管理员账户
-        User::create([
-            'name' => '管理员',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('admin123'),
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => '管理员',
+                'password' => Hash::make('admin123'),
+            ]
+        );
 
-        // 站点配置
         $this->call([
             SiteSettingSeeder::class,
+            PageSeeder::class,
+            HomepageSectionSeeder::class,
         ]);
     }
 }
