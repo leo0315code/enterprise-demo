@@ -1,5 +1,4 @@
 <script setup>
-import { h } from 'vue'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 import CrudPage from '@/Components/CrudPage.vue'
 
@@ -14,12 +13,6 @@ const catOptions = props.categories.map((c) => ({ value: c.id, label: c.name }))
 const columns = [
   { key: 'title', label: '名称', tdClass: 'font-medium text-gray-800' },
   { key: 'category', label: '分类', render: (item) => item.category?.name || '-' },
-  { key: 'status', label: '状态', render: (item) =>
-      item.status === 'active'
-        ? h('span', { class: 'text-green-600' }, '● 在售')
-        : h('span', { class: 'text-gray-400' }, '○ 下架') },
-  { key: 'is_featured', label: '精选', render: (item) =>
-      item.is_featured ? h('span', { class: 'text-amber-500' }, '★') : h('span', {}, '-') },
   { key: 'sort', label: '排序' },
 ]
 
@@ -30,9 +23,9 @@ const formFields = [
   { name: 'status', label: '状态', type: 'select', options: [
       { value: 'active', label: '在售' }, { value: 'inactive', label: '下架' },
     ], default: 'active' },
-  { name: 'thumbnail', label: '缩略图 URL', type: 'text', wrapClass: 'md:col-span-2', placeholder: 'https://... 或上传' },
+  { name: 'thumbnail', label: '缩略图', type: 'image', wrapClass: 'md:col-span-2', placeholder: 'https://... 或上传' },
   { name: 'summary', label: '摘要', type: 'textarea', wrapClass: 'md:col-span-2', rows: 2 },
-  { name: 'content', label: '详情（后续接入富文本）', type: 'textarea', wrapClass: 'md:col-span-2', rows: 5 },
+  { name: 'content', label: '详情', type: 'richtext', wrapClass: 'md:col-span-2' },
   { name: 'sort', label: '排序', type: 'number', default: 0 },
   { name: 'is_featured', label: '设为精选', type: 'checkbox', checkboxLabel: '精选', default: false },
 ]
@@ -67,6 +60,10 @@ const labels = {
       :filter-values="filters"
       :paginator="products"
       :extra-data="{ category_id: catOptions }"
+      :quick-toggles="[
+        { field: 'status', label: '上架', offLabel: '已下架', values: ['active', 'inactive'] },
+        { field: 'is_featured', label: '精选' },
+      ]"
     />
   </AdminLayout>
 </template>

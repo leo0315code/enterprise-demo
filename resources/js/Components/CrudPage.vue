@@ -1,8 +1,9 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, h, isVNode } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
 import { route } from 'ziggy-js'
 import Modal from '@/Components/Modal.vue'
+import RichText from '@/Components/RichText.vue'
 
 /**
  * 通用 CRUD 页面骨架：列表 + 弹窗表单 + 删除。
@@ -19,6 +20,10 @@ import Modal from '@/Components/Modal.vue'
  *  - filters:     可选筛选栏 [{ name, label, type:'text'|'select', options? }]，提交后 router.get 带 query 刷新
  *  - paginator:   可选分页对象（Inertia 的 paginator），含 links/meta
  *  - extraData:   弹窗表单额外隐藏数据（如 categories 下拉），以字段名 => [{value,label}] 形式
+ *  - quickToggles:可选的列表快捷切换，数组 [{ field, label, values?, invertLabel? }]
+ *                 在列表"操作"列渲染一键切换按钮，点击即走现有 update 接口（无需进表单）。
+ *                 - 任意布尔字段(field 为布尔)：点亮=开启，灰=关闭，点击翻面。
+ *                 - 带 values 的字段(如 status)：values=[开启值,关闭值]，点亮=values[0]。
  */
 const props = defineProps({
   items: { type: Array, default: () => [] },
@@ -33,6 +38,7 @@ const props = defineProps({
   filterValues: { type: Object, default: () => ({}) },
   paginator: { type: Object, default: null },
   extraData: { type: Object, default: () => ({}) },
+  quickToggles: { type: Array, default: () => [] },
 })
 
 const editId = ref(null)
@@ -62,6 +68,15 @@ function applyFilters() {
   })
 }
 
+// 将列的 render(item) 返回值统一规范为合法 VNode。
+// 页面里 render 约定可返回：字符串(纯文本，如 "/slug") 或 h() 生成的 VNode。
+// 切记：不要直接把结果塞进 <component :is>（字符串会被当标签名，抛 InvalidCharacterError）。
+function renderCell(col, item) {
+  const out = col.render ? col.render(item) : fieldValue(col.key, item)
+  if (isVNode(out)) return out
+  return h('span', {}, out == null || out === '' ? '' : String(out))
+}
+
 function resetFilters() {
   props.filters.forEach((f) => (filterForm[f.name] = ''))
   applyFilters()
@@ -76,6 +91,41 @@ function optionsFor(field) {
 
 function fieldValue(field, item) {
   return item[field] ?? ''
+}
+
+// 单图上传目标（来自根模板 meta，复用 /manage/upload）
+const uploadUrl = computed(() => {
+  const el = document.querySelector('meta[name="upload-url"]')
+  return el ? el.getAttribute('content') : route('admin.upload.image')
+})
+
+const uploading = ref({})
+
+async function uploadImage(event, name) {
+  const file = event.target.files?.[0]
+  if (!file) return
+  uploading.value = { ...uploading.value, [name]: true }
+  try {
+    const fd = new FormData()
+    fd.append('wangeditor-uploaded-image', file)
+    const res = await fetch(uploadUrl.value, {
+      method: 'POST',
+      body: fd,
+      headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '' },
+      credentials: 'same-origin',
+    })
+    const data = await res.json()
+    if (res.ok && data.errno === 0 && data.data?.url) {
+      form[name] = data.data.url
+    } else {
+      window.alert(data.message || '上传失败')
+    }
+  } catch (e) {
+    window.alert('上传失败：网络错误')
+  } finally {
+    uploading.value = { ...uploading.value, [name]: false }
+    event.target.value = ''
+  }
 }
 
 function openNew() {
@@ -126,8 +176,68 @@ function remove(item) {
   })
 }
 
+// 列表快捷切换：复用现有 update 接口，仅翻转目标字段，不必进表单。
+// 后端 update 把 title/name/status 等标为 required，因此 payload 必须带整行字段，
+// 只改目标布尔位（或 status 值），其余保持原值即可。控制器已有 request()->ajax() 的 JSON 分支。
+const busy = ref({})
+
+function toggleState(item, toggle) {
+  const key = `${item[props.routeKey]}:${toggle.field}`
+  if (busy.value[key]) return
+  busy.value = { ...busy.value, [key]: true }
+
+  // 计算新值：带 values 的（如 status）点亮=values[0]，否则布尔翻面
+  const current = item[toggle.field]
+  const next = toggle.values
+    ? (current !== toggle.values[0] ? toggle.values[0] : toggle.values[1])
+    : !current
+
+  // 组装完整字段 payload（基于列表行 item，缺失则以 form 默认兜底）
+  const payload = {}
+  props.formFields.forEach((f) => {
+    let v = item[f.name]
+    if (v === undefined || v === null) v = f.default ?? ''
+    if (f.type === 'checkbox') v = v ? 1 : 0
+    if (f.type === 'number') v = v === '' || v === null ? 0 : Number(v)
+    payload[f.name] = v
+  })
+  payload[toggle.field] = toggle.values ? next : (next ? 1 : 0)
+
+  const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+  fetch(route(`${props.routePrefix}.update`, item[props.routeKey]), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': csrf,
+      'X-HTTP-Method-Override': 'PUT',
+      'Accept': 'application/json',
+    },
+    credentials: 'same-origin',
+    body: JSON.stringify(payload),
+  })
+    .then(async (res) => {
+      const ok = res.ok
+      if (ok) {
+        item[toggle.field] = next
+        flash(`${toggle.label}已${toggle.values ? (next === toggle.values[0] ? '开启' : '关闭') : (next ? '开启' : '关闭')}`, true)
+      } else {
+        flash('操作失败', false)
+      }
+      return res
+    })
+    .catch(() => flash('操作失败：网络错误', false))
+    .finally(() => {
+      busy.value = { ...busy.value, [key]: false }
+    })
+}
+
 function labelsText(key, fallback) {
   return props.labels[key] ?? fallback
+}
+
+// 判断某 toggle 当前是否点亮：带 values 的比对 values[0]，否则按布尔判断
+function isOn(item, toggle) {
+  return toggle.values ? item[toggle.field] === toggle.values[0] : !!item[toggle.field]
 }
 
 function flash(msg, ok) {
@@ -192,13 +302,29 @@ function checkboxVal(name) {
             :class="col.tdClass || ''"
           >
             <template v-if="col.render">
-              <component :is="col.render(item)" />
+              <component :is="() => renderCell(col, item)" />
             </template>
             <template v-else>
               {{ fieldValue(col.key, item) }}
             </template>
           </td>
           <td class="px-6 py-3 text-right space-x-2 whitespace-nowrap">
+            <!-- 列表快捷切换（无需进表单） -->
+            <button
+              v-for="toggle in quickToggles"
+              :key="toggle.field"
+              type="button"
+              :disabled="busy[`${item[routeKey]}:${toggle.field}`]"
+              class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition border"
+              :class="isOn(item, toggle)
+                ? 'bg-green-50 text-green-600 border-green-200 hover:bg-green-100'
+                : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'"
+              @click="toggleState(item, toggle)"
+            >
+              <span class="text-[10px]">{{ isOn(item, toggle) ? '●' : '○' }}</span>
+              {{ isOn(item, toggle) ? toggle.label : (toggle.offLabel || `未${toggle.label}`) }}
+            </button>
+
             <button type="button" class="text-blue-600 hover:underline" @click="openEdit(item)">编辑</button>
             <button type="button" class="text-red-500 hover:underline" @click="remove(item)">删除</button>
           </td>
@@ -261,6 +387,27 @@ function checkboxVal(name) {
           >
             <option v-for="opt in optionsFor(field)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
+
+          <div v-else-if="field.type === 'richtext'">
+            <RichText v-model="form[field.name]" :placeholder="field.placeholder || '请输入内容…'" :upload-url="uploadUrl" />
+          </div>
+
+          <div v-else-if="field.type === 'image'">
+            <div class="flex items-center gap-3">
+              <input
+                v-model="form[field.name]"
+                type="text"
+                :placeholder="field.placeholder || 'https://... 或上传'"
+                class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+              <label class="shrink-0 cursor-pointer inline-flex items-center gap-1 text-sm text-blue-600 border border-blue-200 bg-blue-50 px-3 py-2 rounded-lg hover:bg-blue-100 transition">
+                <input type="file" accept="image/*" class="hidden" @change="uploadImage($event, field.name)" :disabled="uploading[field.name]" />
+                {{ uploading[field.name] ? '上传中…' : '上传' }}
+              </label>
+              <button v-if="form[field.name]" type="button" class="shrink-0 text-xs text-red-500 hover:underline" @click="form[field.name] = ''">移除</button>
+            </div>
+            <img v-if="form[field.name]" :src="form[field.name]" alt="" class="mt-2 max-h-28 rounded-lg border border-gray-200 object-contain" />
+          </div>
 
           <p v-if="errors[field.name]" class="text-xs text-red-500 mt-1">{{ errors[field.name][0] }}</p>
         </div>

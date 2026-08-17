@@ -9,12 +9,11 @@ createInertiaApp({
         return pages[`./Pages/${name}.vue`]
     },
     setup({ el, App, props, plugin }) {
-        createApp({ render: () => h(App, props) })
-            .use(plugin)
-            // 让模板里 this.$route 与 setup 注入 route 助手（依赖 @routes 注入的全局 Ziggy）
-            .mount(el)
+        const app = createApp({ render: () => h(App, props) })
+        app.use(plugin)
+        // 注册全局 route 助手，使所有模板里可直接使用 route() / route().current()
+        // 依赖 @routes 向全局注入的 Ziggy 配置（globalThis.Ziggy）
+        app.config.globalProperties.route = route
+        app.mount(el)
     },
 })
-
-// 暴露全局 route 助手给 Vue 组件（组合式 API 用 import { route } from 'ziggy-js'）
-window.route = route

@@ -1,5 +1,4 @@
 <script setup>
-import { h } from 'vue'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 import CrudPage from '@/Components/CrudPage.vue'
 
@@ -19,14 +18,6 @@ const columns = [
     key: 'description',
     label: '描述',
     tdClass: 'text-gray-500',
-  },
-  {
-    key: 'is_active',
-    label: '状态',
-    render: (item) =>
-      item.is_active
-        ? h('span', { class: 'text-green-600' }, '● 启用')
-        : h('span', { class: 'text-gray-400' }, '○ 停用'),
   },
 ]
 
@@ -56,6 +47,7 @@ const labels = {
       :form-fields="formFields"
       route-prefix="admin.categories"
       route-key="slug"
+      :quick-toggles="[{ field: 'is_active', label: '启用', offLabel: '已停用' }]"
       :labels="labels"
     />
   </AdminLayout>
