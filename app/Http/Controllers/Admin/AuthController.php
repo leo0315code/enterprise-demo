@@ -14,7 +14,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             return redirect()->route('admin.dashboard');
         }
-        return view('admin.auth.login');
+        return inertia('Login', []);
     }
 
     public function login(Request $request)
@@ -30,6 +30,12 @@ class AuthController extends Controller
         if (Auth::attempt([$field => $login, 'password' => $data['password']], $request->boolean('remember'))) {
             $request->session()->regenerate();
             return redirect()->intended(route('admin.dashboard'));
+        }
+
+        if ($request->inertia() || $request->ajax()) {
+            return back()->withErrors([
+                'login' => '用户名/邮箱或密码错误。',
+            ])->onlyInput('login');
         }
 
         return back()->withErrors([
