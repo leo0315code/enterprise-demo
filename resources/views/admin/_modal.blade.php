@@ -13,7 +13,7 @@
             <input type="hidden" name="_method" value="POST">
             <input type="hidden" name="crud_id" value="">
             <div id="crud-form-body"></div>
-            <div class="flex justify-end gap-3 mt-6">
+            <div id="crud-modal-footer" class="flex justify-end gap-3 mt-6">
                 <button type="button" onclick="CrudModal.close()" class="px-5 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 transition">取消</button>
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 active:scale-95 transition text-white px-6 py-2.5 rounded-lg font-medium">保存</button>
             </div>
@@ -73,7 +73,23 @@ window.CrudModal = (function () {
         form.querySelector('[name="_method"]').value = 'POST';
         form.querySelector('[name="crud_id"]').value = '';
 
-        if (id) {
+        // 只读查看模式：隐藏保存/取消，使用详情片段
+        if (typeof id === 'string' && id.startsWith('view:')) {
+            const realId = id.slice(5);
+            el('crud-modal-title').textContent = cfg.titleView || '详情';
+            el('crud-modal-footer').classList.add('hidden');
+            form.classList.add('crud-readonly');
+            setBody(cfg.blankHtml || '<div class="py-8 text-center text-gray-400">加载中…</div>');
+            if (cfg.viewUrl) {
+                fetch(cfg.viewUrl.replace('__ID__', realId), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(r => r.ok ? r.text() : Promise.reject())
+                    .then(html => setBody(html))
+                    .catch(() => toast('加载失败，请重试', false));
+            }
+        } else if (id) {
+            el('crud-modal-errors');
+            el('crud-modal-footer').classList.remove('hidden');
+            form.classList.remove('crud-readonly');
             el('crud-modal-title').textContent = cfg.titleEdit;
             setBody(cfg.blankHtml);
             fetch(cfg.editUrl.replace('__ID__', id), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
@@ -81,6 +97,8 @@ window.CrudModal = (function () {
                 .then(html => setBody(html))
                 .catch(() => toast('加载失败，请重试', false));
         } else {
+            el('crud-modal-footer').classList.remove('hidden');
+            form.classList.remove('crud-readonly');
             el('crud-modal-title').textContent = cfg.titleNew;
             setBody(cfg.blankHtml);
         }
@@ -138,7 +156,8 @@ window.CrudModal = (function () {
 
     return {
         init(config) { cfg = Object.assign({}, cfg, config); },
-        open, close: hide, submit
+        open, close: hide, submit, toast,
+        view(id) { open('view:' + id); }
     };
 })();
 </script>

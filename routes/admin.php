@@ -60,5 +60,7 @@ Route::prefix($prefix)->name('admin.')->middleware('auth')->group(function () {
     Route::get('/post-categories/rows', [PostCategoryController::class, 'rows'])->name('post-categories.rows');
 
     // 留言管理
+    Route::get('/messages/rows', [ContactMessageController::class, 'rows'])->name('messages.rows');
+    Route::get('/messages/unread-count', [ContactMessageController::class, 'unreadCount'])->name('messages.unread-count');
     Route::resource('messages', ContactMessageController::class)->except(['create', 'store', 'edit', 'update']);
 });
