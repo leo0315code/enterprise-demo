@@ -9,6 +9,8 @@
 <body class="bg-gradient-to-br from-slate-800 to-slate-900 min-h-screen flex items-center justify-center px-4">
     <div class="w-full max-w-sm">
         <div class="text-center mb-8">
+            <div class="mx-auto w-16 h-16 rounded-2xl bg-blue-500 shadow-lg flex items-center justify-center text-white text-2xl font-bold mb-4"
+                 id="login-avatar">{{ mb_substr(setting('site_name', config('app.name')), 0, 1) }}</div>
             <div class="text-white text-2xl font-bold">{{ setting('site_name', config('app.name')) }}</div>
             <div class="text-slate-400 text-sm mt-1">企业官网后台管理系统</div>
         </div>
@@ -47,5 +49,18 @@
             <a href="{{ url('/') }}" class="text-slate-400 text-sm hover:text-white">← 返回网站首页</a>
         </div>
     </div>
+
+    <script>
+    (function () {
+        const input = document.querySelector('input[name="login"]');
+        const avatar = document.getElementById('login-avatar');
+        const fallback = '{{ mb_substr(setting('site_name', config('app.name')), 0, 1) }}';
+        if (!input || !avatar) return;
+        input.addEventListener('input', () => {
+            const v = input.value.trim();
+            avatar.textContent = v ? Array.from(v)[0] : fallback;
+        });
+    })();
+    </script>
 </body>
 </html>

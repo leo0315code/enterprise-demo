@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', '后台管理') - {{ setting('site_name', config('app.name')) }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        /* 侧边栏导航：相对定位承载左侧高亮条 */
+        .nav-link { position: relative; transition: background-color .18s ease, color .18s ease; }
+        .nav-link::before {
+            content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%) scaleY(0);
+            width: 3px; height: 60%; border-radius: 0 3px 3px 0; background: #3b82f6;
+            transition: transform .18s ease;
+        }
+        .nav-link:hover { background-color: rgb(51 65 85); color: #fff; }
+        .nav-link.is-active { background-color: rgb(51 65 85); color: #fff; }
+        .nav-link.is-active::before { transform: translateY(-50%) scaleY(1); }
+    </style>
 </head>
 <body class="h-full bg-gray-100">
     @php($adminPrefix = config('app.admin_prefix', 'manage'))
@@ -15,33 +27,33 @@
                 {{ setting('site_name', config('app.name')) }} <span class="text-xs ml-2 text-slate-400 font-normal">后台</span>
             </div>
             <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.dashboard') ? 'bg-slate-700 text-white' : '' }}">
+                <a href="{{ route('admin.dashboard') }}" class="nav-link flex items-center px-3 py-2 rounded-lg {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">
                     📊 仪表盘
                 </a>
                 <div class="px-3 pt-4 pb-1 text-xs uppercase tracking-wider text-slate-500">内容配置</div>
-                <a href="{{ route('admin.settings.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.settings.*') ? 'bg-slate-700 text-white' : '' }}">
+                <a href="{{ route('admin.settings.index') }}" class="nav-link flex items-center px-3 py-2 rounded-lg {{ request()->routeIs('admin.settings.*') ? 'is-active' : '' }}">
                     ⚙️ 站点设置
                 </a>
-                <a href="{{ route('admin.sections.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.sections.*') ? 'bg-slate-700 text-white' : '' }}">
+                <a href="{{ route('admin.sections.index') }}" class="nav-link flex items-center px-3 py-2 rounded-lg {{ request()->routeIs('admin.sections.*') ? 'is-active' : '' }}">
                     🏠 首页板块
                 </a>
-                <a href="{{ route('admin.pages.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.pages.*') ? 'bg-slate-700 text-white' : '' }}">
+                <a href="{{ route('admin.pages.index') }}" class="nav-link flex items-center px-3 py-2 rounded-lg {{ request()->routeIs('admin.pages.*') ? 'is-active' : '' }}">
                     📄 单页管理
                 </a>
                 <div class="px-3 pt-4 pb-1 text-xs uppercase tracking-wider text-slate-500">内容管理</div>
-                <a href="{{ route('admin.products.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.products.*') ? 'bg-slate-700 text-white' : '' }}">
+                <a href="{{ route('admin.products.index') }}" class="nav-link flex items-center px-3 py-2 rounded-lg {{ request()->routeIs('admin.products.*') ? 'is-active' : '' }}">
                     📦 产品服务
                 </a>
-                <a href="{{ route('admin.categories.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.categories.*') ? 'bg-slate-700 text-white' : '' }}">
+                <a href="{{ route('admin.categories.index') }}" class="nav-link flex items-center px-3 py-2 rounded-lg {{ request()->routeIs('admin.categories.*') ? 'is-active' : '' }}">
                     🏷️ 产品分类
                 </a>
-                <a href="{{ route('admin.posts.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.posts.*') ? 'bg-slate-700 text-white' : '' }}">
+                <a href="{{ route('admin.posts.index') }}" class="nav-link flex items-center px-3 py-2 rounded-lg {{ request()->routeIs('admin.posts.*') ? 'is-active' : '' }}">
                     📰 新闻文章
                 </a>
-                <a href="{{ route('admin.post-categories.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.post-categories.*') ? 'bg-slate-700 text-white' : '' }}">
+                <a href="{{ route('admin.post-categories.index') }}" class="nav-link flex items-center px-3 py-2 rounded-lg {{ request()->routeIs('admin.post-categories.*') ? 'is-active' : '' }}">
                     🗂️ 文章分类
                 </a>
-                <a href="{{ route('admin.messages.index') }}" class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-700 {{ request()->routeIs('admin.messages.*') ? 'bg-slate-700 text-white' : '' }}">
+                <a href="{{ route('admin.messages.index') }}" class="nav-link flex items-center px-3 py-2 rounded-lg {{ request()->routeIs('admin.messages.*') ? 'is-active' : '' }}">
                     ✉️ 留言管理
                 </a>
             </nav>
