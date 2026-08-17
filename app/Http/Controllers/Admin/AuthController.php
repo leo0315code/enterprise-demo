@@ -18,19 +18,22 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
+        $data = $request->validate([
+            'login' => ['required'],
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $login = $data['login'];
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'name';
+
+        if (Auth::attempt([$field => $login, 'password' => $data['password']], $request->boolean('remember'))) {
             $request->session()->regenerate();
             return redirect()->intended(route('admin.dashboard'));
         }
 
         return back()->withErrors([
-            'email' => '邮箱或密码错误。',
-        ])->onlyInput('email');
+            'login' => '用户名/邮箱或密码错误。',
+        ])->onlyInput('login');
     }
 
     public function logout(Request $request)

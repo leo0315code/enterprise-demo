@@ -45,11 +45,19 @@
                     ✉️ 留言管理
                 </a>
             </nav>
-            <div class="p-4 border-t border-slate-700 text-xs text-slate-400">
-                <div class="mb-2">{{ auth()->user()->name ?? '管理员' }}</div>
+            <div class="p-4 border-t border-slate-700">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium text-sm flex-shrink-0">
+                        {{ mb_substr(auth()->user()->name ?? '管', 0, 1) }}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="text-sm text-white font-medium truncate">{{ auth()->user()->name ?? '管理员' }}</div>
+                        <div class="text-xs text-slate-400 truncate">{{ auth()->user()->email ?? '' }}</div>
+                    </div>
+                </div>
                 <form action="{{ route('admin.logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="text-slate-400 hover:text-white">退出登录</button>
+                    <button type="submit" class="w-full text-center text-xs text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg py-2 transition">退出登录</button>
                 </form>
             </div>
         </aside>

@@ -23,8 +23,9 @@
             <form action="{{ route('admin.login.post') }}" method="POST" class="space-y-4">
                 @csrf
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
-                    <input type="email" name="email" value="{{ old('email') }}" required autofocus
+                    <label class="block text-sm font-medium text-gray-700 mb-1">用户名 / 邮箱</label>
+                    <input type="text" name="login" value="{{ old('login') }}" required autofocus
+                        placeholder="请输入用户名或邮箱"
                         class="w-full rounded-lg border-gray-300 border px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
                 </div>
                 <div>
