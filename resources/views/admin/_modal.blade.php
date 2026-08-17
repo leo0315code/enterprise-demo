@@ -59,6 +59,10 @@ window.CrudModal = (function () {
 
     function setBody(html) {
         el('crud-form-body').innerHTML = html;
+        // 若页面引入了富文本编辑器，挂载新插入的 .rich-editor 容器
+        if (window.RichText && typeof window.RichText.refresh === 'function') {
+            window.RichText.refresh(el('crud-form'));
+        }
         if (typeof cfg.afterRender === 'function') {
             cfg.afterRender(el('crud-form'));
         }

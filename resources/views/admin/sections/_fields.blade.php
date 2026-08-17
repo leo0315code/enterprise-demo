@@ -39,8 +39,13 @@
     </div>
 
     <div class="md:col-span-2">
-        <label class="block text-sm font-medium text-gray-700 mb-1">正文内容（支持 HTML）</label>
-        <textarea name="content" rows="6" class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none font-mono">{{ old('content', $section->content ?? '') }}</textarea>
+        <label class="block text-sm font-medium text-gray-700 mb-1">正文内容</label>
+        <div class="rich-editor border border-gray-300 rounded-lg overflow-hidden">
+            <div id="content-toolbar"></div>
+            <div id="content-editor" style="min-height: 240px;"></div>
+            <textarea name="content" data-rt-id="content" class="hidden">{{ old('content', $section->content ?? '') }}</textarea>
+        </div>
+        <p class="text-xs text-gray-400 mt-1">支持加粗、列表、图片上传等可视化排版，图片将上传至本站存储。</p>
     </div>
 
     <div class="md:col-span-2">

@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\PostCategoryController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SiteSettingController;
+use App\Http\Controllers\Admin\UploadController;
 use Illuminate\Support\Facades\Route;
 
 // 后台路径前缀（可在 .env 的 ADMIN_PREFIX 中配置，避免暴露为 admin）
@@ -32,6 +33,9 @@ Route::prefix($prefix)->name('admin.')->middleware('auth')->group(function () {
     // 个人资料 / 修改密码
     Route::get('/profile/password', [AuthController::class, 'showChangePassword'])->name('profile.password');
     Route::put('/profile/password', [AuthController::class, 'updatePassword'])->name('profile.password.update');
+
+    // 富文本编辑器本地上传（受 auth 保护）
+    Route::post('/upload', [UploadController::class, 'image'])->name('upload.image');
 
     // 站点设置
     Route::get('/settings', [SiteSettingController::class, 'index'])->name('settings.index');
