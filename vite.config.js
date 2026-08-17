@@ -25,6 +25,11 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./resources/js', import.meta.url)),
         },
     },
+    build: {
+        // wangEditor 引擎本身 ~800KB，已通过 async 组件拆分为按需加载的独立 chunk，
+        // 与首屏无关；此处仅消除该预期大 chunk 的无意义告警噪音。
+        chunkSizeWarningLimit: 1000,
+    },
     server: {
         watch: {
             ignored: ['**/storage/framework/views/**'],

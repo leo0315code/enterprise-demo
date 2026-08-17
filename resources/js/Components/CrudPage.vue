@@ -1,9 +1,19 @@
 <script setup>
-import { ref, computed, h, isVNode } from 'vue'
+import { ref, computed, h, isVNode, defineAsyncComponent } from 'vue'
 import { router, useForm } from '@inertiajs/vue3'
 import { route } from 'ziggy-js'
 import Modal from '@/Components/Modal.vue'
-import RichText from '@/Components/RichText.vue'
+
+// 富文本编辑器（含 wangEditor ~700KB）按需异步加载，拆分出独立 chunk，
+// 避免前台访客与后台首屏不必要地下载编辑器代码。
+const RichText = defineAsyncComponent({
+  loader: () => import('@/Components/RichText.vue'),
+  loadingComponent: {
+    template:
+      '<div class="p-4 text-sm text-gray-400 border border-gray-300 rounded-lg">富文本编辑器加载中…</div>',
+  },
+  delay: 0,
+})
 
 /**
  * 通用 CRUD 页面骨架：列表 + 弹窗表单 + 删除。
