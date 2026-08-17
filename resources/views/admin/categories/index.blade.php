@@ -37,7 +37,8 @@ CrudModal.init({
     titleNew: '新增分类',
     titleEdit: '编辑分类',
     msgCreate: '分类已创建',
-    msgUpdate: '分类已更新'
+    msgUpdate: '分类已更新',
+    blankHtml: {!! json_encode(view('admin.categories._fields', ['category' => null])->render()) !!}
 });
 </script>
 @endpush

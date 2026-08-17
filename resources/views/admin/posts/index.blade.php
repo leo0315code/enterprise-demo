@@ -71,7 +71,8 @@ CrudModal.init({
         input.addEventListener('input', sync);
         img.addEventListener('error', () => img.classList.add('hidden'));
         sync();
-    }
+    },
+    blankHtml: {!! json_encode(view('admin.posts._fields', ['post' => null, 'categories' => $categories])->render()) !!}
 });
 </script>
 @endpush
