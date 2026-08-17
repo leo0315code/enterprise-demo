@@ -17,11 +17,14 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::where('type', 'product')->ordered()->get();
-        return view('admin.categories.index', compact('categories'));
+
+        return inertia('Categories', [
+            'categories' => $categories,
+        ]);
     }
 
     /**
-     * 仅返回表格局部，供弹窗保存后无刷新刷新列表。
+     * 仅返回表格局部，供弹窗保存后无刷新刷新列表（Blade 端遗留兼容）。
      */
     public function rows()
     {
@@ -81,6 +84,10 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         $category->delete();
+
+        if (request()->ajax() || request()->inertia()) {
+            return response()->json(['ok' => true]);
+        }
         return redirect()->route('admin.categories.index')->with('success', '分类已删除');
     }
 }
