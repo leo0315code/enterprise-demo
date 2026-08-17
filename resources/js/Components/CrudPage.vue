@@ -25,6 +25,7 @@ const props = defineProps({
   labels: { type: Object, default: () => ({}) },
   primaryKey: { type: String, default: 'id' },
   editKey: { type: String, default: '' },
+  routeKey: { type: String, default: 'id' },
 })
 
 const editId = ref(null)
@@ -57,7 +58,7 @@ function openEdit(item) {
   props.formFields.forEach((f) => {
     form[f.name] = item[f.name] ?? f.default ?? ''
   })
-  editId.value = item[props.editKey || props.primaryKey || 'id']
+  editId.value = item[props.routeKey]
   showModal.value = true
 }
 
@@ -86,7 +87,7 @@ function submit() {
 
 function remove(item) {
   if (!confirm('确定删除？')) return
-  router.delete(route(`${props.routePrefix}.destroy`, item[props.editKey || props.primaryKey || 'id']), {
+  router.delete(route(`${props.routePrefix}.destroy`, item[props.routeKey]), {
     preserveScroll: true,
     onSuccess: () => flash('已删除', true),
   })
@@ -178,6 +179,14 @@ function checkboxVal(name) {
           <label v-else-if="field.type === 'checkbox'" class="flex items-center gap-2 text-sm text-gray-700 mt-6">
             <input type="checkbox" v-model="form[field.name]" :value="1" class="rounded" /> {{ field.checkboxLabel || field.label }}
           </label>
+
+          <select
+            v-else-if="field.type === 'select'"
+            v-model="form[field.name]"
+            class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+          >
+            <option v-for="opt in field.options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+          </select>
 
           <p v-if="errors[field.name]" class="text-xs text-red-500 mt-1">{{ errors[field.name][0] }}</p>
         </div>

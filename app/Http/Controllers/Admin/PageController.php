@@ -16,7 +16,9 @@ class PageController extends Controller
     public function index()
     {
         $pages = Page::ordered()->get();
-        return view('admin.pages.index', compact('pages'));
+        return inertia('Pages', [
+            'pages' => $pages,
+        ]);
     }
 
     public function create()
@@ -87,9 +89,16 @@ class PageController extends Controller
     {
         // 保护关键页面（about/contact）不被误删
         if (in_array($page->slug, ['about', 'contact'])) {
+            if (request()->ajax() || request()->inertia()) {
+                return response()->json(['ok' => false, 'message' => '系统页面不可删除'], 422);
+            }
             return redirect()->route('admin.pages.index')->with('error', '系统页面不可删除');
         }
         $page->delete();
+
+        if (request()->ajax() || request()->inertia()) {
+            return response()->json(['ok' => true]);
+        }
         return redirect()->route('admin.pages.index')->with('success', '页面已删除');
     }
 }

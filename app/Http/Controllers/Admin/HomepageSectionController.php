@@ -16,7 +16,9 @@ class HomepageSectionController extends Controller
     public function index()
     {
         $sections = HomepageSection::orderBy('sort')->orderBy('id')->get();
-        return view('admin.sections.index', compact('sections'));
+        return inertia('Sections', [
+            'sections' => $sections,
+        ]);
     }
 
     public function create()
@@ -82,6 +84,10 @@ class HomepageSectionController extends Controller
     public function destroy(HomepageSection $section)
     {
         $section->delete();
+
+        if (request()->ajax() || request()->inertia()) {
+            return response()->json(['ok' => true]);
+        }
         return redirect()->route('admin.sections.index')
             ->with('success', '板块已删除');
     }

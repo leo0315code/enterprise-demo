@@ -17,7 +17,9 @@ class PostCategoryController extends Controller
     public function index()
     {
         $categories = Category::where('type', 'post')->ordered()->get();
-        return view('admin.posts.categories', compact('categories'));
+        return inertia('PostCategories', [
+            'categories' => $categories,
+        ]);
     }
 
     /**
@@ -77,6 +79,10 @@ class PostCategoryController extends Controller
     public function destroy(Category $category)
     {
         $category->delete();
+
+        if (request()->ajax() || request()->inertia()) {
+            return response()->json(['ok' => true]);
+        }
         return redirect()->route('admin.post-categories.index')->with('success', '分类已删除');
     }
 }
