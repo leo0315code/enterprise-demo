@@ -3,6 +3,20 @@
 @section('page_title', '仪表盘')
 
 @section('content')
+@php
+    $hour = now()->hour;
+    $greeting = $hour < 6 ? '凌晨好' : ($hour < 12 ? '上午好' : ($hour < 14 ? '中午好' : ($hour < 18 ? '下午好' : '晚上好')));
+@endphp
+<div class="mb-8 flex items-center gap-4">
+    <div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium text-xl flex-shrink-0">
+        {{ mb_substr(auth()->user()->name ?? '管', 0, 1) }}
+    </div>
+    <div>
+        <h2 class="text-xl font-bold text-gray-800">{{ $greeting }}，{{ auth()->user()->name ?? '管理员' }} 👋</h2>
+        <p class="text-sm text-gray-500 mt-0.5">今天是 {{ now()->format('Y年m月d日') }} · {{ ['日','一','二','三','四','五','六'][now()->dayOfWeek] }} · 欢迎回到 {{ setting('site_name', config('app.name')) }} 后台</p>
+    </div>
+</div>
+
 @if($weakPassword)
 <div class="mb-6 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg flex items-start justify-between gap-4">
     <div>

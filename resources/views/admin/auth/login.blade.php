@@ -5,9 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>后台登录 - {{ setting('site_name', config('app.name')) }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            15% { transform: translateX(-10px); }
+            30% { transform: translateX(8px); }
+            45% { transform: translateX(-6px); }
+            60% { transform: translateX(4px); }
+            75% { transform: translateX(-2px); }
+        }
+        .animate-shake { animation: shake .5s cubic-bezier(.36,.07,.19,.97) both; }
+    </style>
 </head>
 <body class="bg-gradient-to-br from-slate-800 to-slate-900 min-h-screen flex items-center justify-center px-4">
-    <div class="w-full max-w-sm">
+    <div class="w-full max-w-sm" id="login-card">
         <div class="text-center mb-8">
             <div class="mx-auto w-16 h-16 rounded-2xl bg-blue-500 shadow-lg flex items-center justify-center text-white text-2xl font-bold mb-4"
                  id="login-avatar">{{ mb_substr(setting('site_name', config('app.name')), 0, 1) }}</div>
@@ -17,7 +28,7 @@
 
         <div class="bg-white rounded-2xl shadow-xl p-8">
             @if($errors->any())
-                <div class="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+                <div id="login-error" class="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
                     {{ $errors->first() }}
                 </div>
             @endif
@@ -60,6 +71,12 @@
             const v = input.value.trim();
             avatar.textContent = v ? Array.from(v)[0] : fallback;
         });
+
+        const card = document.getElementById('login-card');
+        const errBox = document.getElementById('login-error');
+        if (card && errBox) {
+            requestAnimationFrame(() => card.classList.add('animate-shake'));
+        }
     })();
     </script>
 </body>

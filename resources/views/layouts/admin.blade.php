@@ -57,28 +57,57 @@
                     ✉️ 留言管理
                 </a>
             </nav>
-            <div class="p-4 border-t border-slate-700">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium text-sm flex-shrink-0">
-                        {{ mb_substr(auth()->user()->name ?? '管', 0, 1) }}
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <div class="text-sm text-white font-medium truncate">{{ auth()->user()->name ?? '管理员' }}</div>
-                        <div class="text-xs text-slate-400 truncate">{{ auth()->user()->email ?? '' }}</div>
-                    </div>
-                </div>
-                <form action="{{ route('admin.logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="w-full text-center text-xs text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg py-2 transition">退出登录</button>
-                </form>
+            <div class="p-4 border-t border-slate-700 text-xs text-slate-500">
+                {{ setting('site_name', config('app.name')) }} 后台<br>
+                © {{ date('Y') }} 版权所有
             </div>
         </aside>
 
         <!-- 主内容 -->
         <div class="flex-1 ml-64 flex flex-col min-h-full">
-            <header class="h-16 bg-white shadow-sm flex items-center justify-between px-8 sticky top-0 z-10">
+            <header class="h-16 bg-white shadow-sm flex items-center justify-between px-8 sticky top-0 z-30">
                 <h1 class="text-lg font-semibold text-gray-800">@yield('page_title', '后台管理')</h1>
-                <a href="{{ url('/') }}" target="_blank" class="text-sm text-blue-600 hover:underline">查看网站 →</a>
+                <div class="flex items-center gap-4">
+                    @if(request()->routeIs('admin.dashboard'))
+                        <span class="hidden md:inline-flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2.5 py-1 rounded-full">
+                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> 在线
+                        </span>
+                    @endif
+                    <a href="{{ url('/') }}" target="_blank" class="text-sm text-blue-600 hover:underline">查看网站 →</a>
+                    <div class="relative" id="user-menu">
+                        <button type="button" id="user-menu-btn"
+                            class="flex items-center gap-2 group focus:outline-none">
+                            <span class="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium text-sm flex-shrink-0 shadow-sm">
+                                {{ mb_substr(auth()->user()->name ?? '管', 0, 1) }}
+                            </span>
+                            <span class="text-sm text-gray-700 hidden sm:inline max-w-[120px] truncate">{{ auth()->user()->name ?? '管理员' }}</span>
+                            <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" id="user-menu-caret" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <div id="user-menu-panel"
+                            class="hidden absolute right-0 mt-2 w-60 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50 origin-top-right">
+                            <div class="px-4 py-2.5 border-b border-gray-100 flex items-center gap-3">
+                                <span class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium flex-shrink-0">
+                                    {{ mb_substr(auth()->user()->name ?? '管', 0, 1) }}
+                                </span>
+                                <div class="min-w-0">
+                                    <div class="text-sm font-medium text-gray-800 truncate">{{ auth()->user()->name ?? '管理员' }}</div>
+                                    <div class="text-xs text-gray-400 truncate">{{ auth()->user()->email ?? '' }}</div>
+                                </div>
+                            </div>
+                            <a href="{{ url('/') }}" target="_blank" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                <span>🌐</span> 查看网站
+                            </a>
+                            <form action="{{ route('admin.logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition text-left">
+                                    <span>🚪</span> 退出登录
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </header>
 
             <main class="flex-1 p-8">
@@ -98,5 +127,30 @@
             @stack('scripts')
         </div>
     </div>
+
+    <script>
+    (function () {
+        const root = document.getElementById('user-menu');
+        const btn = document.getElementById('user-menu-btn');
+        const panel = document.getElementById('user-menu-panel');
+        const caret = document.getElementById('user-menu-caret');
+        if (!root || !btn || !panel) return;
+        function toggle(open) {
+            const isOpen = panel.classList.toggle('hidden', !open);
+            caret.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const willOpen = panel.classList.contains('hidden');
+            toggle(willOpen);
+        });
+        document.addEventListener('click', (e) => {
+            if (!root.contains(e.target)) toggle(false);
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') toggle(false);
+        });
+    })();
+    </script>
 </body>
 </html>
