@@ -47,7 +47,7 @@ class AuthController extends Controller
 
     public function showChangePassword()
     {
-        return view('admin.auth.password');
+        return inertia('Password', []);
     }
 
     public function updatePassword(Request $request)
@@ -60,10 +60,17 @@ class AuthController extends Controller
         ]);
 
         if (! Hash::check($data['current_password'], $user->password)) {
+            if ($request->inertia() || $request->ajax()) {
+                return back()->withErrors(['current_password' => '当前密码不正确。'])->withInput();
+            }
             return back()->withErrors(['current_password' => '当前密码不正确。'])->withInput();
         }
 
         $user->update(['password' => Hash::make($data['password'])]);
+
+        if ($request->inertia() || $request->ajax()) {
+            return response()->json(['ok' => true]);
+        }
 
         return redirect()
             ->route('admin.dashboard')

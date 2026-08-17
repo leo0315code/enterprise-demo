@@ -29,7 +29,12 @@ class ProductController extends Controller
         }
         $products = $query->paginate(15)->withQueryString();
         $categories = Category::active()->where('type', 'product')->ordered()->get();
-        return view('admin.products.index', compact('products', 'categories'));
+
+        return inertia('Products', [
+            'products' => $products,
+            'categories' => $categories,
+            'filters' => $request->only(['q', 'category_id', 'status']),
+        ]);
     }
 
     public function create()
@@ -112,6 +117,10 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
+
+        if (request()->ajax() || request()->inertia()) {
+            return response()->json(['ok' => true]);
+        }
         return redirect()->route('admin.products.index')->with('success', '产品已删除');
     }
 }

@@ -16,6 +16,9 @@ import Modal from '@/Components/Modal.vue'
  *  - labels:      { title, newTitle, editTitle, createMsg, updateMsg, empty }
  *  - primaryKey:  行主键字段名，默认 'id'
  *  - editKey:     编辑时用于拼 edit 路由的字段（slug 等），默认用 primaryKey
+ *  - filters:     可选筛选栏 [{ name, label, type:'text'|'select', options? }]，提交后 router.get 带 query 刷新
+ *  - paginator:   可选分页对象（Inertia 的 paginator），含 links/meta
+ *  - extraData:   弹窗表单额外隐藏数据（如 categories 下拉），以字段名 => [{value,label}] 形式
  */
 const props = defineProps({
   items: { type: Array, default: () => [] },
@@ -26,6 +29,10 @@ const props = defineProps({
   primaryKey: { type: String, default: 'id' },
   editKey: { type: String, default: '' },
   routeKey: { type: String, default: 'id' },
+  filters: { type: Array, default: () => [] },
+  filterValues: { type: Object, default: () => ({}) },
+  paginator: { type: Object, default: null },
+  extraData: { type: Object, default: () => ({}) },
 })
 
 const editId = ref(null)
@@ -40,6 +47,32 @@ const form = useForm(
 )
 
 const isEdit = computed(() => editId.value !== null)
+
+// 筛选栏：初始值从当前页面 filterValues 回填
+const filterForm = useForm(
+  Object.fromEntries(
+    props.filters.map((f) => [f.name, props.filterValues[f.name] ?? ''])
+  )
+)
+
+function applyFilters() {
+  router.get(route(`${props.routePrefix}.index`), filterForm.data(), {
+    preserveScroll: true,
+    preserveState: true,
+  })
+}
+
+function resetFilters() {
+  props.filters.forEach((f) => (filterForm[f.name] = ''))
+  applyFilters()
+}
+
+// 表单字段若为 select 且 options 来自 extraData，取其映射
+function optionsFor(field) {
+  if (field.options) return field.options
+  if (props.extraData[field.name]) return props.extraData[field.name]
+  return []
+}
 
 function fieldValue(field, item) {
   return item[field] ?? ''
@@ -119,6 +152,30 @@ function checkboxVal(name) {
       >+ {{ labels.newTitle || '新增' }}</button>
     </div>
 
+    <!-- 筛选栏（可选） -->
+    <div v-if="filters.length" class="px-6 py-4 border-b border-gray-100 bg-gray-50/60 flex flex-wrap gap-3 items-end">
+      <div v-for="f in filters" :key="f.name" class="flex flex-col gap-1">
+        <label class="text-xs text-gray-500">{{ f.label }}</label>
+        <input
+          v-if="f.type !== 'select'"
+          v-model="filterForm[f.name]"
+          type="text"
+          :placeholder="f.placeholder || ''"
+          class="rounded-lg border-gray-300 border px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 w-44"
+        />
+        <select
+          v-else
+          v-model="filterForm[f.name]"
+          class="rounded-lg border-gray-300 border px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-white w-44"
+        >
+          <option value="">全部</option>
+          <option v-for="opt in (f.options || [])" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+        </select>
+      </div>
+      <button type="button" class="px-4 py-1.5 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700" @click="applyFilters">筛选</button>
+      <button type="button" class="px-3 py-1.5 rounded-lg text-gray-600 text-sm hover:bg-gray-100" @click="resetFilters">重置</button>
+    </div>
+
     <table class="w-full text-sm">
       <thead class="bg-gray-50 text-gray-500 text-left">
         <tr>
@@ -154,6 +211,23 @@ function checkboxVal(name) {
       </tbody>
     </table>
 
+    <!-- 分页（可选） -->
+    <div v-if="paginator && paginator.links" class="px-6 py-4 flex items-center justify-between text-sm text-gray-500">
+      <span>共 {{ paginator.total }} 条</span>
+      <div class="flex gap-1">
+        <button
+          v-for="link in paginator.links"
+          :key="link.label"
+          type="button"
+          :disabled="!link.url"
+          v-html="link.label"
+          class="px-3 py-1.5 rounded-lg border border-gray-200 text-sm disabled:opacity-40"
+          :class="link.active ? 'bg-blue-600 text-white border-blue-600' : 'hover:bg-gray-100'"
+          @click="link.url && router.get(link.url)"
+        ></button>
+      </div>
+    </div>
+
     <Modal :open="showModal" :title="isEdit ? (labels.editTitle || '编辑') : (labels.newTitle || '新增')" :submitting="submitting" @close="showModal = false">
       <form id="modal-form" @submit.prevent="submit" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div v-for="field in formFields" :key="field.name" :class="field.wrapClass || ''">
@@ -185,7 +259,7 @@ function checkboxVal(name) {
             v-model="form[field.name]"
             class="w-full rounded-lg border-gray-300 border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
           >
-            <option v-for="opt in field.options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            <option v-for="opt in optionsFor(field)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
 
           <p v-if="errors[field.name]" class="text-xs text-red-500 mt-1">{{ errors[field.name][0] }}</p>

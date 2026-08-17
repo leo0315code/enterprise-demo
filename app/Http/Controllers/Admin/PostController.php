@@ -29,7 +29,12 @@ class PostController extends Controller
         }
         $posts = $query->paginate(15)->withQueryString();
         $categories = Category::active()->where('type', 'post')->ordered()->get();
-        return view('admin.posts.index', compact('posts', 'categories'));
+
+        return inertia('Posts', [
+            'posts' => $posts,
+            'categories' => $categories,
+            'filters' => $request->only(['q', 'category_id', 'status']),
+        ]);
     }
 
     public function create()
@@ -117,6 +122,10 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         $post->delete();
-        return redirect()->route('admin.posts.index')->with('success', '文章已删除');
+
+        if (request()->ajax() || request()->inertia()) {
+            return response()->json(['ok' => true]);
+        }
+        return redirect()->route('admin.products.index')->with('success', '文章已删除');
     }
 }

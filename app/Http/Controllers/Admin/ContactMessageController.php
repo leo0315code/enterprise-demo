@@ -17,11 +17,14 @@ class ContactMessageController extends Controller
     {
         $messages = ContactMessage::latest()->paginate(20);
         $unread = ContactMessage::where('is_read', false)->count();
-        return view('admin.messages.index', compact('messages', 'unread'));
+        return inertia('Messages', [
+            'messages' => $messages,
+            'unread' => $unread,
+        ]);
     }
 
     /**
-     * 仅返回表格局部，供删除后无刷新刷新列表。
+     * 仅返回表格局部，供删除后无刷新刷新列表（Blade 遗留兼容）。
      */
     public function rows()
     {
@@ -34,8 +37,8 @@ class ContactMessageController extends Controller
         if (!$message->is_read) {
             $message->update(['is_read' => true]);
         }
-        if (request()->ajax()) {
-            return view('admin.messages._detail', compact('message'));
+        if (request()->ajax() || request()->inertia()) {
+            return response()->json(['message' => $message]);
         }
         return view('admin.messages.show', compact('message'));
     }
@@ -43,7 +46,8 @@ class ContactMessageController extends Controller
     public function destroy(ContactMessage $message)
     {
         $message->delete();
-        if (request()->ajax()) {
+
+        if (request()->ajax() || request()->inertia()) {
             return response()->json(['ok' => true]);
         }
         return redirect()->route('admin.messages.index')->with('success', '留言已删除');

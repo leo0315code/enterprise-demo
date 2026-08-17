@@ -18,12 +18,6 @@ class SiteSettingController extends Controller
      */
     public function index()
     {
-        $groups = SiteSetting::query()
-            ->orderBy('group')
-            ->orderBy('sort')
-            ->get()
-            ->groupBy('group');
-
         $groupLabels = [
             'general' => '基础信息',
             'contact' => '联系方式',
@@ -32,7 +26,32 @@ class SiteSettingController extends Controller
             'theme' => '主题配置',
         ];
 
-        return view('admin.settings.index', compact('groups', 'groupLabels'));
+        $groups = SiteSetting::query()
+            ->orderBy('group')
+            ->orderBy('sort')
+            ->get()
+            ->groupBy('group')
+            ->map(function ($items, $group) use ($groupLabels) {
+                return [
+                    'key' => $group,
+                    'label' => $groupLabels[$group] ?? $group,
+                    'items' => $items->map(function ($s) {
+                        return [
+                            'key' => $s->key,
+                            'label' => $s->label,
+                            'description' => $s->description,
+                            'type' => $s->type,
+                            'value' => $s->value,
+                        ];
+                    })->all(),
+                ];
+            })
+            ->values()
+            ->all();
+
+        return inertia('Settings', [
+            'groups' => $groups,
+        ]);
     }
 
     /**
@@ -47,6 +66,10 @@ class SiteSettingController extends Controller
         }
 
         SiteSetting::clearCache();
+
+        if ($request->inertia() || $request->ajax()) {
+            return response()->json(['ok' => true]);
+        }
 
         return redirect()
             ->route('admin.settings.index')
