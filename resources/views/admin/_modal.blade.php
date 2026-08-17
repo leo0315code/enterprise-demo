@@ -63,6 +63,10 @@ window.CrudModal = (function () {
         if (window.RichText && typeof window.RichText.refresh === 'function') {
             window.RichText.refresh(el('crud-form'));
         }
+        // 若页面引入了单图上传组件，绑定新插入的 .image-picker
+        if (window.ImagePicker && typeof window.ImagePicker.refresh === 'function') {
+            window.ImagePicker.refresh(el('crud-form'));
+        }
         if (typeof cfg.afterRender === 'function') {
             cfg.afterRender(el('crud-form'));
         }

@@ -24,13 +24,14 @@
         </select>
     </div>
     <div class="md:col-span-2">
-        <label class="block text-sm font-medium text-gray-700 mb-1">封面图片 URL</label>
-        <div class="flex gap-4 items-start">
-            <input type="text" name="thumbnail" id="thumbnail" value="{{ old('thumbnail', $product->thumbnail ?? '') }}" placeholder="https://..." class="flex-1 rounded-lg border-gray-300 border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-            <img id="thumbnail-preview" src="{{ old('thumbnail', $product->thumbnail ?? '') }}" alt="预览"
-                 class="hidden w-20 h-20 object-cover rounded-lg border border-gray-200">
+        <label class="block text-sm font-medium text-gray-700 mb-1">封面图片</label>
+        <div class="image-picker flex gap-4 items-start" style="--ip-accent:#3b82f6">
+            <input type="text" name="thumbnail" class="ip-url flex-1 rounded-lg border-gray-300 border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" value="{{ old('thumbnail', $product->thumbnail ?? '') }}" placeholder="https://... 或点右侧按钮上传">
+            <button type="button" class="ip-btn shrink-0 px-4 py-2 rounded-lg text-sm font-medium text-white" style="background:var(--ip-accent)">上传图片</button>
+            <input type="file" accept="image/*" class="ip-file hidden">
+            <img class="ip-preview hidden w-20 h-20 object-cover rounded-lg border border-gray-200" src="{{ old('thumbnail', $product->thumbnail ?? '') }}" alt="预览">
         </div>
-        <p class="text-xs text-gray-400 mt-1">留空则前台自动展示默认占位图。粘贴图片链接后会即时预览。</p>
+        <p class="text-xs text-gray-400 mt-1">可贴外链或点"上传图片"直传本站（留空则前台展示默认占位图）。</p>
     </div>
     <div class="md:col-span-2">
         <label class="block text-sm font-medium text-gray-700 mb-1">简介</label>
