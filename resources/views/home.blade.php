@@ -6,7 +6,7 @@
 
         {{-- Hero Banner --}}
         @case('hero')
-            <section class="relative bg-gradient-to-br from-blue-600 to-indigo-700 text-white overflow-hidden">
+            <section class="relative text-white overflow-hidden" style="background-image: linear-gradient(to bottom right, var(--color-primary), var(--color-primary-dark));">
                 <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_20%_20%,white,transparent)]"></div>
                 <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28 text-center">
                     <h1 class="text-4xl md:text-6xl font-bold mb-6">{{ $section->title }}</h1>
@@ -80,9 +80,9 @@
                             <a href="{{ route('products.show', $product->slug) }}"
                                class="bg-gray-bg rounded-xl overflow-hidden shadow-sm hover:shadow-md transition group">
                                 @if($product->thumbnail)
-                                    <img src="{{ $product->thumbnail }}" alt="{{ $product->title }}" class="w-full h-48 object-cover">
+                                    <img src="{{ $product->thumbnail }}" alt="{{ $product->title }}" class="w-full h-48 object-cover" loading="lazy">
                                 @else
-                                    <div class="w-full h-48 bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center text-5xl">📦</div>
+                                    <div class="w-full h-48 bg-primary/10 flex items-center justify-center text-5xl text-primary">📦</div>
                                 @endif
                                 <div class="p-5">
                                     <h3 class="font-semibold text-gray-900 group-hover:text-primary transition">{{ $product->title }}</h3>
@@ -117,9 +117,9 @@
                             <a href="{{ route('posts.show', $post->slug) }}"
                                class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition group">
                                 @if($post->cover)
-                                    <img src="{{ $post->cover }}" alt="{{ $post->title }}" class="w-full h-48 object-cover">
+                                    <img src="{{ $post->cover }}" alt="{{ $post->title }}" class="w-full h-48 object-cover" loading="lazy">
                                 @else
-                                    <div class="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-5xl">📰</div>
+                                    <div class="w-full h-48 bg-gray-100 flex items-center justify-center text-5xl">📰</div>
                                 @endif
                                 <div class="p-5">
                                     <div class="text-xs text-gray-400 mb-2">{{ $post->published_at?->format('Y-m-d') ?? $post->created_at->format('Y-m-d') }}</div>

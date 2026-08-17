@@ -3,7 +3,7 @@
 @section('title', '新闻动态')
 
 @section('content')
-<section class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white py-16">
+<section class="py-16 text-white" style="background-image: linear-gradient(to bottom right, var(--color-primary), var(--color-primary-dark));">
     <div class="max-w-7xl mx-auto px-4 text-center">
         <h1 class="text-4xl font-bold mb-3">新闻动态</h1>
         <p class="text-blue-100">了解我们的最新资讯与行业洞察</p>
@@ -28,9 +28,9 @@
                 <a href="{{ route('posts.show', $post->slug) }}"
                    class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition group">
                     @if($post->cover)
-                        <img src="{{ $post->cover }}" alt="{{ $post->title }}" class="w-full h-48 object-cover">
+                        <img src="{{ $post->cover }}" alt="{{ $post->title }}" class="w-full h-48 object-cover" loading="lazy">
                     @else
-                        <div class="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-5xl">📰</div>
+                        <div class="w-full h-48 bg-gray-100 flex items-center justify-center text-5xl">📰</div>
                     @endif
                     <div class="p-5">
                         <div class="text-xs text-gray-400 mb-2">{{ $post->published_at?->format('Y-m-d') ?? $post->created_at->format('Y-m-d') }}</div>

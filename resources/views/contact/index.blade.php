@@ -3,7 +3,7 @@
 @section('title', '联系我们')
 
 @section('content')
-<section class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white py-16">
+<section class="py-16 text-white" style="background-image: linear-gradient(to bottom right, var(--color-primary), var(--color-primary-dark));">
     <div class="max-w-7xl mx-auto px-4 text-center">
         <h1 class="text-4xl font-bold mb-3">联系我们</h1>
         <p class="text-blue-100">期待与您的每一次沟通</p>

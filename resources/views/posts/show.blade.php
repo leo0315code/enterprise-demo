@@ -18,7 +18,7 @@
         <h1 class="text-3xl font-bold text-gray-900 mb-6">{{ $post->title }}</h1>
 
         @if($post->cover)
-            <img src="{{ $post->cover }}" alt="{{ $post->title }}" class="w-full rounded-xl mb-8">
+            <img src="{{ $post->cover }}" alt="{{ $post->title }}" class="w-full rounded-xl mb-8" loading="lazy">
         @endif
 
         <div class="prose-content">

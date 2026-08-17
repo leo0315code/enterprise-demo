@@ -3,7 +3,7 @@
 @section('title', '产品服务')
 
 @section('content')
-<section class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white py-16">
+<section class="py-16 text-white" style="background-image: linear-gradient(to bottom right, var(--color-primary), var(--color-primary-dark));">
     <div class="max-w-7xl mx-auto px-4 text-center">
         <h1 class="text-4xl font-bold mb-3">产品服务</h1>
         <p class="text-blue-100">为您提供专业、可靠的解决方案</p>
@@ -29,9 +29,9 @@
                 <a href="{{ route('products.show', $product->slug) }}"
                    class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition group">
                     @if($product->thumbnail)
-                        <img src="{{ $product->thumbnail }}" alt="{{ $product->title }}" class="w-full h-48 object-cover">
+                        <img src="{{ $product->thumbnail }}" alt="{{ $product->title }}" class="w-full h-48 object-cover" loading="lazy">
                     @else
-                        <div class="w-full h-48 bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center text-5xl">📦</div>
+                        <div class="w-full h-48 bg-primary/10 flex items-center justify-center text-5xl text-primary">📦</div>
                     @endif
                     <div class="p-5">
                         <h3 class="font-semibold text-gray-900 group-hover:text-primary transition">{{ $product->title }}</h3>
