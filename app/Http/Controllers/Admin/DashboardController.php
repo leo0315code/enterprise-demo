@@ -33,6 +33,12 @@ class DashboardController extends Controller
         $recentMessages = ContactMessage::latest()->take(5)->get();
         $recentPosts = Post::latest()->take(5)->get();
 
-        return view('admin.dashboard', compact('stats', 'weakPassword', 'recentMessages', 'recentPosts'));
+        return inertia('Dashboard', [
+            'stats' => $stats,
+            'weakPassword' => $weakPassword,
+            'recentMessages' => $recentMessages,
+            'recentPosts' => $recentPosts,
+            'pageTitle' => '仪表盘',
+        ]);
     }
 }
