@@ -2,13 +2,13 @@
 <div id="crud-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
     <div class="modal-overlay absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300"
          onclick="CrudModal.close()"></div>
-    <div class="modal-card relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl opacity-0 scale-95 translate-y-4 transition-all duration-300">
+    <div class="modal-card relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl opacity-0 scale-95 translate-y-4 transition-all duration-300 max-h-[90vh] flex flex-col">
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <h3 id="crud-modal-title" class="text-lg font-semibold text-gray-800">编辑</h3>
             <button type="button" onclick="CrudModal.close()" class="text-gray-400 hover:text-gray-700 text-2xl leading-none">&times;</button>
         </div>
         <div id="crud-modal-errors" class="hidden mx-6 mt-4 rounded-lg bg-red-50 text-red-600 text-sm p-3 space-y-1"></div>
-        <form id="crud-form" class="p-6 max-h-[70vh] overflow-y-auto" onsubmit="event.preventDefault(); CrudModal.submit();">
+        <form id="crud-form" class="p-6 flex-1 min-h-0 overflow-y-auto" onsubmit="event.preventDefault(); CrudModal.submit();">
             @csrf
             <input type="hidden" name="_method" value="POST">
             <input type="hidden" name="crud_id" value="">

@@ -16,8 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $adminPrefix = env('ADMIN_PREFIX', 'manage');
-        $middleware->redirectGuestsTo(fn () => route($adminPrefix . '.login'));
+        $middleware->redirectGuestsTo(fn () => route('admin.login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

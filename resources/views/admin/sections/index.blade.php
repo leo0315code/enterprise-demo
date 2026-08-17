@@ -35,7 +35,7 @@
          onclick="closeSectionModal()"></div>
 
     {{-- 弹窗卡片（缩放淡入） --}}
-    <div class="modal-card relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl opacity-0 scale-95 translate-y-4 transition-all duration-300">
+    <div class="modal-card relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl opacity-0 scale-95 translate-y-4 transition-all duration-300 max-h-[90vh] flex flex-col">
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <h3 id="section-modal-title" class="text-lg font-semibold text-gray-800">新增板块</h3>
             <button type="button" onclick="closeSectionModal()" class="text-gray-400 hover:text-gray-700 text-2xl leading-none">&times;</button>
