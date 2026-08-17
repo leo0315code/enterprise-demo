@@ -17,6 +17,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Upload Disk（后台上传切换开关）
+    |--------------------------------------------------------------------------
+    |
+    | 后台图片上传（富文本 / 封面 / 缩略图）使用的存储磁盘。默认 `public`
+    | 走本地 + storage:link 软链。可改为 `oss` 切换至阿里云 OSS（需先在
+    | 下方 disks.oss 与 .env 中填好 OSS_* 配置）。切换只改 .env 一处即可。
+    |
+    */
+    'upload_disk' => env('UPLOAD_DISK', 'public'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Filesystem Disks
     |--------------------------------------------------------------------------
     |
@@ -56,6 +68,22 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'throw' => false,
+            'report' => false,
+        ],
+
+        // 阿里云 OSS（走 S3 兼容协议，无需额外 SDK）。默认不启用，
+        // 当 .env 中 UPLOAD_DISK=oss 并填好下方 OSS_* 配置后生效。
+        // 注意：OSS bucket 需设为「公共读」，或改用 Storage::temporaryUrl 生成签名地址。
+        'oss' => [
+            'driver' => 's3',
+            'key' => env('OSS_ACCESS_KEY_ID'),
+            'secret' => env('OSS_ACCESS_KEY_SECRET'),
+            'region' => env('OSS_REGION', 'cn-hangzhou'),
+            'bucket' => env('OSS_BUCKET'),
+            'endpoint' => env('OSS_ENDPOINT'),
+            'url' => env('OSS_URL'),
+            'use_path_style_endpoint' => env('OSS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
             'report' => false,
         ],

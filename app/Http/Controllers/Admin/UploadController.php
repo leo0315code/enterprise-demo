@@ -30,12 +30,15 @@ class UploadController extends Controller
             'image' => ['nullable', 'image', 'max:10240'],
         ]);
 
-        $ext = $file->getClientOriginalExtension() ?: 'png';
-        $name = date('Ym') . '/' . Str::uuid()->toString() . '.' . $ext;
+        // 上传磁盘由 config/filesystems.upload_disk 控制，默认 public（本地），
+        // 改为 oss 即切换阿里云 OSS，仅需修改 .env 的 UPLOAD_DISK 与 OSS_* 配置。
+        $disk = config('filesystems.upload_disk', 'public');
 
-        // 存入 storage/app/public/uploads，通过 public/storage 软链对外可访问
-        $path = $file->storeAs('uploads', $name, 'public');
-        $url = Storage::disk('public')->url($path);
+        $ext = $file->getClientOriginalExtension() ?: 'png';
+        $name = 'uploads/' . date('Ym') . '/' . Str::uuid()->toString() . '.' . $ext;
+
+        $path = $file->storeAs('', $name, $disk);
+        $url = Storage::disk($disk)->url($path);
 
         return response()->json([
             'errno' => 0,
