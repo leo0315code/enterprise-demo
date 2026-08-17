@@ -11,7 +11,7 @@
         @endif
     </td>
     <td class="px-6 py-3 text-right space-x-2 whitespace-nowrap">
-        <button type="button" class="text-blue-600 hover:underline" onclick="openSectionModal({{ $section->id }})">编辑</button>
+        <button type="button" class="text-blue-600 hover:underline" onclick="CrudModal.open({{ $section->id }})">编辑</button>
         <form action="{{ route('admin.sections.destroy', $section) }}" method="POST" class="inline" onsubmit="return confirm('确认删除该板块？');">
             @csrf @method('DELETE')
             <button class="text-red-500 hover:underline">删除</button>

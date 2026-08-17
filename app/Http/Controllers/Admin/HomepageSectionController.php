@@ -21,7 +21,7 @@ class HomepageSectionController extends Controller
 
     public function create()
     {
-        return view('admin.sections.form', ['section' => null]);
+        return redirect()->route('admin.sections.index');
     }
 
     /**
@@ -57,7 +57,7 @@ class HomepageSectionController extends Controller
         if (request()->ajax()) {
             return view('admin.sections._fields', compact('section'));
         }
-        return view('admin.sections.form', compact('section'));
+        return redirect()->route('admin.sections.index');
     }
 
     public function update(Request $request, HomepageSection $section)
