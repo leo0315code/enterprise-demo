@@ -86,7 +86,7 @@
                             </svg>
                         </button>
                         <div id="user-menu-panel"
-                            class="hidden absolute right-0 mt-2 w-60 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50 origin-top-right">
+                            class="hidden absolute right-0 mt-2 w-60 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50 origin-top-right opacity-0 scale-95 transition-all duration-150 ease-out">
                             <div class="px-4 py-2.5 border-b border-gray-100 flex items-center gap-3">
                                 <span class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium flex-shrink-0">
                                     {{ mb_substr(auth()->user()->name ?? '管', 0, 1) }}
@@ -96,6 +96,9 @@
                                     <div class="text-xs text-gray-400 truncate">{{ auth()->user()->email ?? '' }}</div>
                                 </div>
                             </div>
+                            <a href="{{ route('admin.profile.password') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                <span>🔑</span> 修改密码
+                            </a>
                             <a href="{{ url('/') }}" target="_blank" class="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition">
                                 <span>🌐</span> 查看网站
                             </a>
@@ -136,8 +139,17 @@
         const caret = document.getElementById('user-menu-caret');
         if (!root || !btn || !panel) return;
         function toggle(open) {
-            const isOpen = panel.classList.toggle('hidden', !open);
-            caret.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
+            if (open) {
+                panel.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    panel.classList.remove('opacity-0', 'scale-95');
+                });
+                caret.style.transform = 'rotate(180deg)';
+            } else {
+                panel.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => panel.classList.add('hidden'), 150);
+                caret.style.transform = 'rotate(0deg)';
+            }
         }
         btn.addEventListener('click', (e) => {
             e.stopPropagation();

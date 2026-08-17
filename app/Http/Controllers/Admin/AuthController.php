@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -42,5 +43,30 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect()->route('admin.login');
+    }
+
+    public function showChangePassword()
+    {
+        return view('admin.auth.password');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::user();
+
+        $data = $request->validate([
+            'current_password' => ['required'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        if (! Hash::check($data['current_password'], $user->password)) {
+            return back()->withErrors(['current_password' => '当前密码不正确。'])->withInput();
+        }
+
+        $user->update(['password' => Hash::make($data['password'])]);
+
+        return redirect()
+            ->route('admin.dashboard')
+            ->with('success', '密码已修改成功，旧密码提醒已解除。');
     }
 }

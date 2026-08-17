@@ -29,6 +29,10 @@ Route::prefix($prefix)->name('admin.')->middleware('auth')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+    // 个人资料 / 修改密码
+    Route::get('/profile/password', [AuthController::class, 'showChangePassword'])->name('profile.password');
+    Route::put('/profile/password', [AuthController::class, 'updatePassword'])->name('profile.password.update');
+
     // 站点设置
     Route::get('/settings', [SiteSettingController::class, 'index'])->name('settings.index');
     Route::put('/settings', [SiteSettingController::class, 'update'])->name('settings.update');
