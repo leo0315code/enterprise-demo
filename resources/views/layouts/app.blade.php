@@ -6,7 +6,7 @@
     <title>@yield('title', setting('site_name', config('app.name'))) - {{ setting('site_slogan', '') }}</title>
     <meta name="description" content="@yield('description', setting('seo_description', ''))">
     <meta name="keywords" content="@yield('keywords', setting('seo_keywords', ''))">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite('resources/css/app.css')
     <style>
         :root {
             --primary: {{ setting('theme_primary_color', '#2563eb') }};
