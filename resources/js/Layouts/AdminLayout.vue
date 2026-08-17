@@ -22,20 +22,33 @@ const nav = [
 const userMenuOpen = ref(false)
 const menuRoot = ref(null)
 
+// 侧边栏（移动端抽屉）开合状态
+const sidebarOpen = ref(false)
+function toggleSidebar() { sidebarOpen.value = !sidebarOpen.value }
+function closeSidebar() { sidebarOpen.value = false }
+
 function toggleMenu() { userMenuOpen.value = !userMenuOpen.value }
 function closeMenu() { userMenuOpen.value = false }
 function onDocClick(e) {
     if (menuRoot.value && !menuRoot.value.contains(e.target)) closeMenu()
 }
-function onKey(e) { if (e.key === 'Escape') closeMenu() }
+function onKey(e) {
+    if (e.key === 'Escape') { closeMenu(); closeSidebar() }
+}
+function onResize() {
+    // 回到桌面尺寸时收起抽屉，避免状态残留
+    if (window.innerWidth >= 1024) sidebarOpen.value = false
+}
 
 onMounted(() => {
     document.addEventListener('click', onDocClick)
     document.addEventListener('keydown', onKey)
+    window.addEventListener('resize', onResize)
 })
 onUnmounted(() => {
     document.removeEventListener('click', onDocClick)
     document.removeEventListener('keydown', onKey)
+    window.removeEventListener('resize', onResize)
 })
 
 const firstName = computed(() => (user.value.name || '管').charAt(0))
@@ -44,7 +57,8 @@ const firstName = computed(() => (user.value.name || '管').charAt(0))
 <template>
     <div class="min-h-full flex">
         <!-- 侧边栏 -->
-        <aside class="w-64 bg-slate-800 text-gray-300 flex flex-col fixed h-full">
+        <aside class="w-64 bg-slate-800 text-gray-300 flex flex-col fixed h-full z-40 transition-transform duration-200 ease-in-out -translate-x-full lg:translate-x-0"
+            :class="{ 'translate-x-0': sidebarOpen }">
             <div class="h-16 flex items-center px-6 text-white font-bold text-lg border-b border-slate-700">
                 {{ page.props.siteName || '企业官网' }}
                 <span class="text-xs ml-2 text-slate-400 font-normal">后台</span>
@@ -67,12 +81,32 @@ const firstName = computed(() => (user.value.name || '管').charAt(0))
             </div>
         </aside>
 
+        <!-- 移动端遮罩 -->
+        <transition
+            enter-active-class="transition-opacity duration-200 ease-out"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+            leave-active-class="transition-opacity duration-200 ease-in"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0">
+            <div v-if="sidebarOpen" @click="closeSidebar"
+                class="fixed inset-0 bg-black/40 z-30 lg:hidden"></div>
+        </transition>
+
         <!-- 主内容 -->
-        <div class="flex-1 ml-64 flex flex-col min-h-full">
+        <div class="flex-1 lg:ml-64 flex flex-col min-h-full">
             <header class="h-16 bg-white shadow-sm flex items-center justify-between px-8 sticky top-0 z-30">
-                <slot name="header">
-                    <h1 class="text-lg font-semibold text-gray-800">{{ page.props.pageTitle || '后台管理' }}</h1>
-                </slot>
+                <div class="flex items-center gap-3">
+                    <button type="button" @click.stop="toggleSidebar" aria-label="切换菜单"
+                        class="lg:hidden flex items-center justify-center w-9 h-9 rounded-lg text-gray-600 hover:bg-gray-100 transition">
+                        <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 5A.75.75 0 012.75 9h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 9.75zm0 5a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                    <slot name="header">
+                        <h1 class="text-lg font-semibold text-gray-800">{{ page.props.pageTitle || '后台管理' }}</h1>
+                    </slot>
+                </div>
                 <div class="flex items-center gap-4">
                     <Link v-if="route().current('admin.dashboard')" href="#"
                         class="hidden md:inline-flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2.5 py-1 rounded-full">
