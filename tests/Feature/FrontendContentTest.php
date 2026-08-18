@@ -75,6 +75,7 @@ class FrontendContentTest extends TestCase
         $this->get('/sitemap.xml')
             ->assertOk()
             ->assertHeader('Content-Type', 'application/xml')
+            ->assertHeader('Cache-Control')
             ->assertSee('visible-post', false)
             ->assertDontSee('invisible-post', false);
     }
@@ -85,7 +86,8 @@ class FrontendContentTest extends TestCase
             ->assertOk()
             ->assertHeader('X-Content-Type-Options', 'nosniff')
             ->assertHeader('X-Frame-Options', 'SAMEORIGIN')
-            ->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+            ->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
+            ->assertHeader('Content-Security-Policy');
     }
 
     public function test_not_found_uses_custom_error_page(): void
@@ -172,6 +174,7 @@ class FrontendContentTest extends TestCase
         $this->get('/feed.xml')
             ->assertOk()
             ->assertHeader('Content-Type', 'application/rss+xml; charset=UTF-8')
+            ->assertHeader('Cache-Control')
             ->assertSee('RSS 收录文章')
             ->assertDontSee('未发布文章');
     }

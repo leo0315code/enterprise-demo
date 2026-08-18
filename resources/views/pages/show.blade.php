@@ -6,6 +6,19 @@
 
 @section('canonical', route('page.show', $page->slug))
 
+@push('jsonld')
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "首页", "item": @json(url('/'))},
+        {"@type": "ListItem", "position": 2, "name": @json($page->title)}
+    ]
+}
+</script>
+@endpush
+
 @section('content')
 <section class="py-16 bg-white">
     <div class="max-w-4xl mx-auto px-4">

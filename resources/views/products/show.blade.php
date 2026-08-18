@@ -23,6 +23,17 @@
     "url": @json(route('products.show', $product->slug))
 }
 </script>
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "首页", "item": @json(url('/'))},
+        {"@type": "ListItem", "position": 2, "name": "产品服务", "item": @json(route('products.index'))},
+        {"@type": "ListItem", "position": 3, "name": @json($product->title)}
+    ]
+}
+</script>
 @endpush
 
 @section('content')

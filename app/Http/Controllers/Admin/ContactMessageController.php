@@ -62,4 +62,45 @@ class ContactMessageController extends Controller
             'count' => ContactMessage::where('is_read', false)->count(),
         ]);
     }
+
+    /**
+     * 导出所有留言为 CSV 文件
+     */
+    public function export()
+    {
+        $messages = ContactMessage::latest()->get();
+
+        $csv = "姓名,邮箱,电话,主题,留言内容,是否已读,提交时间\n";
+        foreach ($messages as $message) {
+            $csv .= sprintf(
+                "%s,%s,%s,%s,%s,%s,%s\n",
+                $this->escapeCsv($message->name),
+                $this->escapeCsv($message->email),
+                $this->escapeCsv($message->phone ?? ''),
+                $this->escapeCsv($message->subject ?? ''),
+                $this->escapeCsv($message->message),
+                $message->is_read ? '是' : '否',
+                $message->created_at->format('Y-m-d H:i:s')
+            );
+        }
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="messages-' . date('Y-m-d') . '.csv"',
+        ]);
+    }
+
+    /**
+     * CSV 字段转义：包含逗号、引号或换行时用双引号包裹
+     */
+    protected function escapeCsv(?string $value): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+        if (str_contains($value, ',') || str_contains($value, '"') || str_contains($value, "\n")) {
+            return '"' . str_replace('"', '""', $value) . '"';
+        }
+        return $value;
+    }
 }

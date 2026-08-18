@@ -25,6 +25,10 @@ class SecurityHeaders
             'Referrer-Policy' => 'strict-origin-when-cross-origin',
             // 本站不需要摄像头/麦克风/定位等敏感硬件能力
             'Permissions-Policy' => 'camera=(), microphone=(), geolocation=()',
+            // Content Security Policy：限制资源加载来源，防 XSS 与数据注入
+            'Content-Security-Policy' => "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self';",
+            // HTTPS 强制：浏览器在 1 年内仅通过 HTTPS 访问本站
+            'Strict-Transport-Security' => 'max-age=31536000; includeSubDomains',
         ];
 
         foreach ($headers as $name => $value) {

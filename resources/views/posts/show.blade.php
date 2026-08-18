@@ -27,6 +27,17 @@
     "mainEntityOfPage": @json(route('posts.show', $post->slug))
 }
 </script>
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "首页", "item": @json(url('/'))},
+        {"@type": "ListItem", "position": 2, "name": "新闻动态", "item": @json(route('posts.index'))},
+        {"@type": "ListItem", "position": 3, "name": @json($post->title)}
+    ]
+}
+</script>
 @endpush
 
 @section('content')
