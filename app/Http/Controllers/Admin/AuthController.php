@@ -32,12 +32,6 @@ class AuthController extends Controller
             return redirect()->intended(route('admin.dashboard'));
         }
 
-        if ($request->inertia() || $request->ajax()) {
-            return back()->withErrors([
-                'login' => '用户名/邮箱或密码错误。',
-            ])->onlyInput('login');
-        }
-
         return back()->withErrors([
             'login' => '用户名/邮箱或密码错误。',
         ])->onlyInput('login');
@@ -66,17 +60,10 @@ class AuthController extends Controller
         ]);
 
         if (! Hash::check($data['current_password'], $user->password)) {
-            if ($request->inertia() || $request->ajax()) {
-                return back()->withErrors(['current_password' => '当前密码不正确。'])->withInput();
-            }
             return back()->withErrors(['current_password' => '当前密码不正确。'])->withInput();
         }
 
         $user->update(['password' => Hash::make($data['password'])]);
-
-        if ($request->inertia() || $request->ajax()) {
-            return response()->json(['ok' => true]);
-        }
 
         return redirect()
             ->route('admin.dashboard')
