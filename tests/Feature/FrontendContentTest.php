@@ -83,4 +83,43 @@ class FrontendContentTest extends TestCase
     {
         $this->get('/')->assertOk();
     }
+
+    public function test_not_found_uses_custom_error_page(): void
+    {
+        $this->get('/news/no-such-post')
+            ->assertNotFound()
+            ->assertSee('页面走丢了');
+    }
+
+    public function test_search_filters_posts_by_keyword(): void
+    {
+        Post::create([
+            'title' => '数字化转型实践', 'slug' => 'post-a', 'content' => '<p>a</p>',
+            'is_active' => true, 'published_at' => now()->subDay(),
+        ]);
+        Post::create([
+            'title' => '团队建设活动', 'slug' => 'post-b', 'content' => '<p>b</p>',
+            'is_active' => true, 'published_at' => now()->subDay(),
+        ]);
+
+        $this->get('/news?'.http_build_query(['q' => '数字化']))
+            ->assertOk()
+            ->assertSee('数字化转型实践')
+            ->assertDontSee('团队建设活动');
+    }
+
+    public function test_post_detail_shows_previous_and_next_links(): void
+    {
+        foreach ([['older', 3], ['middle', 2], ['newer', 1]] as [$slug, $daysAgo]) {
+            Post::create([
+                'title' => "文章 {$slug}", 'slug' => $slug, 'content' => '<p>x</p>',
+                'is_active' => true, 'published_at' => now()->subDays($daysAgo),
+            ]);
+        }
+
+        $this->get('/news/middle')
+            ->assertOk()
+            ->assertSee('文章 older')   // 上一篇（更早）
+            ->assertSee('文章 newer');  // 下一篇（更新）
+    }
 }
