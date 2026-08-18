@@ -46,7 +46,7 @@
                 <a href="{{ route('products.show', $product->slug) }}"
                    class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition group">
                     @if($product->thumbnail)
-                        <img src="{{ $product->thumbnail }}" alt="{{ $product->title }}" class="w-full h-48 object-cover" loading="lazy">
+                        <img src="{{ thumb_url($product->thumbnail) }}" alt="{{ $product->title }}" class="w-full h-48 object-cover" loading="lazy">
                     @else
                         <div class="w-full h-48 bg-primary/10 flex items-center justify-center text-5xl text-primary">📦</div>
                     @endif

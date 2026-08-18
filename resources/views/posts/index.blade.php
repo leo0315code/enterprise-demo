@@ -45,7 +45,7 @@
                 <a href="{{ route('posts.show', $post->slug) }}"
                    class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition group">
                     @if($post->cover)
-                        <img src="{{ $post->cover }}" alt="{{ $post->title }}" class="w-full h-48 object-cover" loading="lazy">
+                        <img src="{{ thumb_url($post->cover) }}" alt="{{ $post->title }}" class="w-full h-48 object-cover" loading="lazy">
                     @else
                         <div class="w-full h-48 bg-gray-100 flex items-center justify-center text-5xl">📰</div>
                     @endif
