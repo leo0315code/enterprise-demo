@@ -48,6 +48,10 @@
             <h2 class="text-xl font-bold text-gray-900 mb-6">在线留言</h2>
             <form action="{{ route('contact.submit') }}" method="POST" class="space-y-4">
                 @csrf
+                {{-- honeypot：隐藏字段，正常用户不可见，机器人填写后留言将被丢弃 --}}
+                <div class="hidden" aria-hidden="true">
+                    <label>请勿填写此项<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+                </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <input type="text" name="name" placeholder="您的姓名" required value="{{ old('name') }}" class="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary outline-none @error('name') border-red-400 @enderror">
                     <input type="tel" name="phone" placeholder="联系电话" value="{{ old('phone') }}" class="w-full rounded-lg border-gray-300 border px-4 py-2.5 focus:ring-2 focus:ring-primary focus:border-primary outline-none">

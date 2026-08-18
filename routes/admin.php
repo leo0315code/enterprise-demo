@@ -19,9 +19,9 @@ $prefix = config('ADMIN_PREFIX', 'manage');
 
 // ========== 后台认证 ==========
 Route::prefix($prefix)->name('admin.')->group(function () {
-    // 未登录可访问
+    // 未登录可访问（登录接口限流防暴力破解，见 AppServiceProvider::configureRateLimiting）
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('login.post');
 });
 
 // ========== 后台受保护路由 ==========

@@ -25,17 +25,17 @@ class UploadController extends Controller
         }
 
         $request->validate([
-            'wangeditor-uploaded-image' => ['nullable', 'image', 'max:10240'],
-            'file' => ['nullable', 'image', 'max:10240'],
-            'image' => ['nullable', 'image', 'max:10240'],
+            'wangeditor-uploaded-image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:10240'],
+            'file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:10240'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:10240'],
         ]);
 
         // 上传磁盘由 config/filesystems.upload_disk 控制，默认 public（本地），
         // 改为 oss 即切换阿里云 OSS，仅需修改 .env 的 UPLOAD_DISK 与 OSS_* 配置。
         $disk = config('filesystems.upload_disk', 'public');
 
-        $ext = $file->getClientOriginalExtension() ?: 'png';
-        $name = 'uploads/' . date('Ym') . '/' . Str::uuid()->toString() . '.' . $ext;
+        // 扩展名基于 MIME 推断（extension()），不信任客户端传来的原始扩展名
+        $name = 'uploads/' . date('Ym') . '/' . Str::uuid()->toString() . '.' . ($file->extension() ?: 'png');
 
         $path = $file->storeAs('', $name, $disk);
         $url = Storage::disk($disk)->url($path);
