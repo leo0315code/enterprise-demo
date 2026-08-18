@@ -21,14 +21,15 @@ class ProductController extends Controller
                 $products->where('category_id', $cat->id);
             }
         }
-        $products = $products->paginate(9);
+        $products = $products->paginate(9)->withQueryString();
 
         return view('products.index', compact('products', 'categories', 'categorySlug'));
     }
 
     public function show($slug)
     {
-        $product = Product::where('slug', $slug)->firstOrFail();
+        // 仅展示上架产品（与列表页 active scope 一致）
+        $product = Product::active()->where('slug', $slug)->firstOrFail();
         return view('products.show', compact('product'));
     }
 }

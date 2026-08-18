@@ -15,9 +15,9 @@ class HomeController extends Controller
         $sections = HomepageSection::getForHomepage();
 
         // 最新新闻（首页新闻板块使用）
-        $latestPosts = Post::active()->latest()->take(3)->get();
+        $latestPosts = Post::published()->latestPublished()->take(3)->get();
         // 推荐产品
-        $featuredProducts = Product::active()->take(3)->get();
+        $featuredProducts = Product::active()->ordered()->take(3)->get();
 
         return view('home', compact('sections', 'latestPosts', 'featuredProducts'));
     }

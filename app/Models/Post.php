@@ -28,7 +28,19 @@ class Post extends Model
         return $query->where('is_active', true);
     }
 
-    public function scopeLatest($query)
+    /**
+     * 前台可见：启用且已到发布时间
+     */
+    public function scopePublished($query)
+    {
+        return $query->active()
+            ->where(fn ($q) => $q->whereNull('published_at')->orWhere('published_at', '<=', now()));
+    }
+
+    /**
+     * 按发布时间倒序（避免覆盖框架内置 latest()）
+     */
+    public function scopeLatestPublished($query)
     {
         return $query->orderBy('published_at', 'desc')->orderBy('id', 'desc');
     }
