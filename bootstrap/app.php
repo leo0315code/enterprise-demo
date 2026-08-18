@@ -17,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(fn () => route('admin.login'));
+        // 全局安全响应头（X-Frame-Options / nosniff 等）
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         // Inertia 根模板中间件：让 web 与 admin 路由支持无刷新页面切换
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
