@@ -11,6 +11,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $categorySlug = $request->query('category');
+        $keyword = trim((string) $request->query('q', ''));
 
         $categories = Category::active()->where('type', 'product')->ordered()->get();
 
@@ -21,9 +22,14 @@ class ProductController extends Controller
                 $products->where('category_id', $cat->id);
             }
         }
+        if ($keyword !== '') {
+            $products->where(fn ($q) => $q
+                ->where('title', 'like', "%{$keyword}%")
+                ->orWhere('summary', 'like', "%{$keyword}%"));
+        }
         $products = $products->paginate(9)->withQueryString();
 
-        return view('products.index', compact('products', 'categories', 'categorySlug'));
+        return view('products.index', compact('products', 'categories', 'categorySlug', 'keyword'));
     }
 
     public function show($slug)

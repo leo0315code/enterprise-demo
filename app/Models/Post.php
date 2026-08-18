@@ -54,4 +54,76 @@ class Post extends Model
     {
         return 'slug';
     }
+
+    /**
+     * 排序基准时间：未设发布时间时回退到创建时间
+     */
+    protected function sortTimestamp(): \Illuminate\Support\Carbon
+    {
+        return $this->published_at ?? $this->created_at;
+    }
+
+    /**
+     * 上一篇（列表排序口径：发布时间倒序、同时间按 id 倒序）
+     */
+    public function previousOf(): ?self
+    {
+        $ts = $this->sortTimestamp();
+
+        return static::published()
+            ->where(function ($q) use ($ts) {
+                $q->whereRaw('COALESCE(published_at, created_at) < ?', [$ts])
+                    ->orWhere(function ($q2) use ($ts) {
+                        $q2->whereRaw('COALESCE(published_at, created_at) = ?', [$ts])
+                            ->where('id', '<', $this->id);
+                    });
+            })
+            ->orderByRaw('COALESCE(published_at, created_at) DESC')
+            ->orderBy('id', 'desc')
+            ->first();
+    }
+
+    /**
+     * 下一篇
+     */
+    public function nextOf(): ?self
+    {
+        $ts = $this->sortTimestamp();
+
+        return static::published()
+            ->where(function ($q) use ($ts) {
+                $q->whereRaw('COALESCE(published_at, created_at) > ?', [$ts])
+                    ->orWhere(function ($q2) use ($ts) {
+                        $q2->whereRaw('COALESCE(published_at, created_at) = ?', [$ts])
+                            ->where('id', '>', $this->id);
+                    });
+            })
+            ->orderByRaw('COALESCE(published_at, created_at)')
+            ->orderBy('id')
+            ->first();
+    }
+
+    /**
+     * 相关文章：优先同类，不足时用最新文章补齐
+     */
+    public function relatedTo(int $limit = 3): \Illuminate\Support\Collection
+    {
+        $related = $this->category_id
+            ? static::published()
+                ->where('category_id', $this->category_id)
+                ->where('id', '!=', $this->id)
+                ->latestPublished()->take($limit)->get()
+            : collect();
+
+        if ($related->count() < $limit) {
+            $related = $related->concat(
+                static::published()
+                    ->where('id', '!=', $this->id)
+                    ->whereNotIn('id', $related->pluck('id'))
+                    ->latestPublished()->take($limit - $related->count())->get()
+            );
+        }
+
+        return $related;
+    }
 }

@@ -14,6 +14,7 @@
     <meta property="og:description" content="@yield('description', setting('seo_description', ''))">
     <meta property="og:url" content="@yield('canonical', url()->current())">
     @hasSection('og_image')<meta property="og:image" content="@yield('og_image')">@endif
+    @stack('jsonld')
     @vite('resources/css/app.css')
     <style>
         :root {

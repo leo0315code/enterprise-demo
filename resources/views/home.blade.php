@@ -1,5 +1,23 @@
 @extends('layouts.app')
 
+@push('jsonld')
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@type": "Organization",
+    "name": @json(setting('site_name', config('app.name'))),
+    "description": @json(setting('site_description', '')),
+    "url": @json(url('/'))
+    @if(setting('contact_phone'))
+    ,"telephone": @json(setting('contact_phone'))
+    @endif
+    @if(setting('contact_address'))
+    ,"address": @json(setting('contact_address'))
+    @endif
+}
+</script>
+@endpush
+
 @section('content')
 @foreach($sections as $section)
     @switch($section->type)
