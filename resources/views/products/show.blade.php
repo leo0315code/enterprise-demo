@@ -52,4 +52,28 @@
         </div>
     </div>
 </section>
+
+{{-- 相关产品 --}}
+@if($relatedProducts->count())
+<section class="py-14 bg-gray-bg">
+    <div class="max-w-4xl mx-auto px-4">
+        <h2 class="text-xl font-bold text-gray-900 mb-6">相关产品</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            @foreach($relatedProducts as $related)
+                <a href="{{ route('products.show', $related->slug) }}"
+                   class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition group">
+                    @if($related->thumbnail)
+                        <img src="{{ thumb_url($related->thumbnail) }}" alt="{{ $related->title }}" class="w-full h-32 object-cover" loading="lazy">
+                    @else
+                        <div class="w-full h-32 bg-primary/10 flex items-center justify-center text-3xl text-primary">📦</div>
+                    @endif
+                    <div class="p-4">
+                        <h3 class="font-medium text-gray-900 group-hover:text-primary transition line-clamp-1">{{ $related->title }}</h3>
+                    </div>
+                </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
 @endsection

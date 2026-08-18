@@ -36,6 +36,9 @@ class ProductController extends Controller
     {
         // 仅展示上架产品（与列表页 active scope 一致）
         $product = Product::active()->where('slug', $slug)->firstOrFail();
-        return view('products.show', compact('product'));
+
+        $relatedProducts = $product->relatedTo(3);
+
+        return view('products.show', compact('product', 'relatedProducts'));
     }
 }

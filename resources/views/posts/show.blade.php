@@ -45,6 +45,7 @@
             {{ $post->published_at?->format('Y-m-d') ?? $post->created_at->format('Y-m-d') }}
             @if($post->category) · {{ $post->category->name }} @endif
             @if($post->author) · {{ $post->author }} @endif
+            · {{ number_format($post->views) }} 次浏览
         </div>
 
         <h1 class="text-3xl font-bold text-gray-900 mb-6">{{ $post->title }}</h1>

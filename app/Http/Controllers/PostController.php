@@ -32,10 +32,18 @@ class PostController extends Controller
         return view('posts.index', compact('posts', 'categories', 'categorySlug', 'keyword'));
     }
 
-    public function show($slug)
+    public function show(Request $request, $slug)
     {
         // 仅展示启用且已到发布时间的文章（与列表页口径一致）
         $post = Post::published()->where('slug', $slug)->firstOrFail();
+
+        // 浏览量：同一会话内去重
+        $viewKey = 'viewed_post_'.$post->id;
+        if (! $request->session()->has($viewKey)) {
+            $post->increment('views');
+            $post->views = (int) $post->views + 1; // 同步内存值，保证当次页面展示正确
+            $request->session()->put($viewKey, true);
+        }
 
         $prevPost = $post->previousOf();
         $nextPost = $post->nextOf();

@@ -122,4 +122,35 @@ class FrontendContentTest extends TestCase
             ->assertSee('文章 older')   // 上一篇（更早）
             ->assertSee('文章 newer');  // 下一篇（更新）
     }
+
+    public function test_post_views_increment_once_per_session(): void
+    {
+        Post::create([
+            'title' => '浏览统计', 'slug' => 'view-count', 'content' => '<p>x</p>',
+            'is_active' => true, 'published_at' => now()->subDay(),
+        ]);
+
+        $this->get('/news/view-count')->assertOk();
+        $this->get('/news/view-count')->assertOk();
+
+        $this->assertSame(1, Post::where('slug', 'view-count')->value('views'));
+    }
+
+    public function test_product_detail_shows_related_products(): void
+    {
+        $category = \App\Models\Category::create([
+            'name' => '云服务', 'slug' => 'cloud', 'type' => 'product', 'is_active' => true,
+        ]);
+        foreach (['prod-a', 'prod-b'] as $slug) {
+            Product::create([
+                'title' => "产品 {$slug}", 'slug' => $slug,
+                'content' => '<p>x</p>', 'status' => 'active', 'category_id' => $category->id,
+            ]);
+        }
+
+        $this->get('/products/prod-a')
+            ->assertOk()
+            ->assertSee('相关产品')
+            ->assertSee('产品 prod-b');
+    }
 }
