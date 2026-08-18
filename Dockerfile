@@ -1,5 +1,11 @@
 FROM php:8.3-cli
 
+# 配置国内镜像源
+RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list.d/debian.sources || \
+    echo "deb http://mirrors.aliyun.com/debian trixie main" > /etc/apt/sources.list && \
+    echo "deb http://mirrors.aliyun.com/debian trixie-updates main" >> /etc/apt/sources.list && \
+    echo "deb http://mirrors.aliyun.com/debian-security trixie-security main" >> /etc/apt/sources.list
+
 # 安装系统依赖
 RUN apt-get update && apt-get install -y \
     git \
@@ -7,6 +13,10 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    libwebp-dev \
     zip \
     unzip \
     nano \
@@ -16,7 +26,10 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 安装 PHP 扩展
+RUN docker-php-ext-configure gd --enable-gd --with-jpeg --with-freetype
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+
+# 安装 GD 扩展的额外库
 
 # 安装 Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
