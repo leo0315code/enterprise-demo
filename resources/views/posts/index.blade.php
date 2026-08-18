@@ -2,6 +2,11 @@
 
 @section('title', '新闻动态')
 
+{{-- 第 2 页起不收录，避免分页内容重复 --}}
+@if($posts->currentPage() > 1)
+@section('robots', 'noindex,follow')
+@endif
+
 @section('content')
 <section class="py-16 text-white" style="background-image: linear-gradient(to bottom right, var(--color-primary), var(--color-primary-dark));">
     <div class="max-w-7xl mx-auto px-4 text-center">

@@ -6,7 +6,10 @@
     <title>@yield('title', setting('site_name', config('app.name'))) - {{ setting('site_slogan', '') }}</title>
     <meta name="description" content="@yield('description', setting('seo_description', ''))">
     <meta name="keywords" content="@yield('keywords', setting('seo_keywords', ''))">
+    @hasSection('robots')<meta name="robots" content="@yield('robots')">@endif
     @hasSection('canonical')<link rel="canonical" href="@yield('canonical')">@endif
+    {{-- RSS 订阅源 --}}
+    <link rel="alternate" type="application/rss+xml" title="{{ setting('site_name', config('app.name')) }}" href="{{ route('feed') }}">
     {{-- Open Graph（社交分享） --}}
     <meta property="og:site_name" content="{{ setting('site_name', config('app.name')) }}">
     <meta property="og:type" content="@yield('og_type', 'website')">

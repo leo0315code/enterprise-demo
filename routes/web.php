@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\FeedController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
@@ -29,5 +30,6 @@ Route::get('/news/{slug}', [PostController::class, 'show'])->name('posts.show');
 // 联系我们 - 留言提交（限流防垃圾留言，见 AppServiceProvider::configureRateLimiting）
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:contact')->name('contact.submit');
 
-// SEO：站点地图
+// SEO：站点地图与 RSS 订阅源
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/feed.xml', [FeedController::class, 'index'])->name('feed');

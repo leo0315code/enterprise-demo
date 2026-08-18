@@ -157,4 +157,35 @@ class FrontendContentTest extends TestCase
             ->assertSee('相关产品')
             ->assertSee('产品 prod-b');
     }
+
+    public function test_feed_returns_rss_with_published_posts(): void
+    {
+        Post::create([
+            'title' => 'RSS 收录文章', 'slug' => 'rss-post', 'content' => '<p>x</p>',
+            'summary' => '文章摘要', 'is_active' => true, 'published_at' => now()->subDay(),
+        ]);
+        Post::create([
+            'title' => '未发布文章', 'slug' => 'draft-post', 'content' => '<p>x</p>',
+            'is_active' => false, 'published_at' => now()->subDay(),
+        ]);
+
+        $this->get('/feed.xml')
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/rss+xml; charset=UTF-8')
+            ->assertSee('RSS 收录文章')
+            ->assertDontSee('未发布文章');
+    }
+
+    public function test_listing_second_page_is_noindexed(): void
+    {
+        foreach (range(1, 10) as $i) {
+            Post::create([
+                'title' => "文章 {$i}", 'slug' => "post-{$i}", 'content' => '<p>x</p>',
+                'is_active' => true, 'published_at' => now()->subDays($i),
+            ]);
+        }
+
+        $this->get('/news')->assertOk()->assertDontSee('noindex');
+        $this->get('/news?page=2')->assertOk()->assertSee('noindex,follow');
+    }
 }
