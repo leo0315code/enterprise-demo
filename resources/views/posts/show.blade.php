@@ -2,7 +2,15 @@
 
 @section('title', $post->title)
 
-@section('description', $post->summary)
+@section('description', $post->summary ?? '')
+
+@section('canonical', route('posts.show', $post->slug))
+
+@section('og_type', 'article')
+
+@if($post->cover)
+@section('og_image', url($post->cover))
+@endif
 
 @section('content')
 <section class="py-16 bg-white">

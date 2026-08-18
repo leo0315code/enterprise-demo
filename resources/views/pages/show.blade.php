@@ -2,7 +2,9 @@
 
 @section('title', $page->seo_title ?: $page->title)
 
-@section('description', $page->seo_description)
+@section('description', $page->seo_description ?? '')
+
+@section('canonical', route('page.show', $page->slug))
 
 @section('content')
 <section class="py-16 bg-white">

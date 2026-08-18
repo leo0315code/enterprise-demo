@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 // 首页
@@ -25,5 +26,8 @@ Route::get('/products/{slug}', [ProductController::class, 'show'])->name('produc
 Route::get('/news', [PostController::class, 'index'])->name('posts.index');
 Route::get('/news/{slug}', [PostController::class, 'show'])->name('posts.show');
 
-// 联系我们 - 留言提交
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.submit');
+// 联系我们 - 留言提交（限流防垃圾留言，见 AppServiceProvider::configureRateLimiting）
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:contact')->name('contact.submit');
+
+// SEO：站点地图
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');

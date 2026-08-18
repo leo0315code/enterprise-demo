@@ -2,6 +2,14 @@
 
 @section('title', $product->title)
 
+@section('description', $product->summary ?? '')
+
+@section('canonical', route('products.show', $product->slug))
+
+@if($product->thumbnail)
+@section('og_image', url($product->thumbnail))
+@endif
+
 @section('content')
 <section class="py-16 bg-white">
     <div class="max-w-4xl mx-auto px-4">
