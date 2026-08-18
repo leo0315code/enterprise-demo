@@ -92,3 +92,113 @@ routes/
 `products`(推荐产品) | `news`(最新新闻) | `cta`(行动召唤) | `custom`(自定义)
 
 `features` 类型的 `extra` 字段为 JSON 数组：`[{"icon":"🚀","title":"标题","desc":"描述"}]`
+
+## 部署说明
+
+### 环境准备
+- 服务器支持 PHP 8.3+
+- MySQL 5.7+ 数据库
+- Web 服务器（Apache/Nginx）
+- Node.js 20+（用于构建前端资源）
+
+### 部署步骤
+
+1. **上传代码到服务器**
+```bash
+# 通过 Git 克隆或上传压缩包解压到网站目录
+```
+
+2. **安装 PHP 依赖**
+```bash
+composer install --optimize-autoloader --no-dev
+```
+
+3. **配置环境变量**
+```bash
+# 复制示例配置文件
+cp .env.example .env
+
+# 编辑 .env 文件，配置数据库连接等信息
+vim .env
+
+# 生成应用密钥
+php artisan key:generate
+```
+
+4. **数据库初始化**
+```bash
+# 执行数据库迁移
+php artisan migrate --force
+
+# 填充初始数据（可选）
+php artisan db:seed
+```
+
+5. **构建前端资源**
+```bash
+npm install
+npm run build
+```
+
+6. **设置目录权限**
+```bash
+chmod -R 755 storage bootstrap/cache
+chown -R www-data:www-data storage bootstrap/cache
+```
+
+7. **配置 Web 服务器**
+
+**Apache (需要启用 mod_rewrite)**:
+- 确保项目根目录有 .htaccess 文件
+- DocumentRoot 指向 `public` 目录
+
+**Nginx 配置示例**:
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    root /path/to/your/project/public;
+    index index.php;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+    }
+
+    location ~ /\. {
+        deny all;
+    }
+}
+```
+
+8. **配置定时任务（可选）**
+
+如果需要定时执行某些任务，可在服务器上添加 Cron 任务：
+```bash
+* * * * * cd /path/to/your/project && php artisan schedule:run >> /dev/null 2>&1
+```
+
+### 生产环境优化
+
+- 在 `.env` 中设置 `APP_ENV=production` 和 `APP_DEBUG=false`
+- 使用 `opcache.enable=1` 优化 PHP 性能
+- 配置 CDN 用于静态资源加速
+- 启用数据库查询缓存
+- 定期备份数据库和上传文件
+
+### 常见问题
+
+1. **权限问题**：确保 `storage` 和 `bootstrap/cache` 目录可写
+2. **URL 重写**：确保 Web 服务器正确配置了 URL 重写规则
+3. **内存限制**：对于大文件上传，可能需要增加 PHP 的内存和上传大小限制
+
+## 文档
+
+- [部署指南](DEPLOYMENT.md) - 详细部署说明
+- [安全说明](SECURITY.md) - 安全特性和最佳实践
+- [API 文档](API.md) - 接口详细说明
+- [贡献指南](CONTRIBUTING.md) - 如何参与项目开发
