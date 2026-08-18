@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # 应用程序服务
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: enterprise-website-app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    ports:
+      - "8000:8000"
+    networks:
+      - enterprise-website-network
+    depends_on:
+      - mysql
+      - redis
+    command: >
+      sh -c "sleep 10 &&
+              php artisan migrate --force &&
+              php artisan serve --host=0.0.0.0 --port=8000"
+
+  # 数据库服务
+  mysql:
+    image: mysql:8.0
+    container_name: enterprise-website-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: enterprise_website
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - enterprise-website-network
+    command: --default-authentication-plugin=mysql_native_password
+
+  # Redis 缓存
+  redis:
+    image: redis:alpine
+    container_name: enterprise-website-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - enterprise-website-network
+
+networks:
+  enterprise-website-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
