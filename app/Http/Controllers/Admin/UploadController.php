@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\Thumbnail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Drivers\Gd\Driver;
-use Intervention\Image\ImageManager;
 
 /**
  * 富文本编辑器（wangEditor）专用本地图片上传。
@@ -56,21 +55,8 @@ class UploadController extends Controller
      */
     protected function makeThumbnail(string $disk, string $path): void
     {
-        if (! preg_match('/\.(jpe?g|png|webp)$/i', $path, $m)) {
-            return;
-        }
-
         try {
-            $storage = Storage::disk($disk);
-            $image = (new ImageManager(new Driver()))->decodeBinary($storage->get($path));
-            $image->scaleDown(width: 600);
-
-            $thumbPath = preg_replace('/\.(jpe?g|png|webp)$/i', '_thumb.$1', $path);
-            // png 编码器无 quality 参数，单独处理
-            $encoded = strtolower($m[1]) === 'png'
-                ? $image->encodeUsingPath($thumbPath)
-                : $image->encodeUsingPath($thumbPath, quality: 82);
-            $storage->put($thumbPath, (string) $encoded);
+            Thumbnail::generate($disk, $path);
         } catch (\Throwable $e) {
             Log::warning('缩略图生成失败: '.$e->getMessage());
         }
